@@ -11,15 +11,15 @@ public class DefaultFileChooser extends JFileChooser {
   private static final long serialVersionUID = 1L;
   
   static {
-    UIManager.put("FileChooser.lookInLabelMnemonic", new Integer(69));
+    UIManager.put("FileChooser.lookInLabelMnemonic", 69);
     UIManager.put("FileChooser.lookInLabelText", "Pesquisar em");
     UIManager.put("FileChooser.saveInLabelText", "Salvar em");
     UIManager.put("FileChooser.openButtonToolTipText", "Abrir");
     UIManager.put("FileChooser.openButtonAccessibleName", "Abrir");
     UIManager.put("FileChooser.openButtonText", "Abrir");
-    UIManager.put("FileChooser.fileNameLabelMnemonic", new Integer(78));
+    UIManager.put("FileChooser.fileNameLabelMnemonic", 78);
     UIManager.put("FileChooser.fileNameLabelText", "Nome do arquivo");
-    UIManager.put("FileChooser.filesOfTypeLabelMnemonic", new Integer(84));
+    UIManager.put("FileChooser.filesOfTypeLabelMnemonic", 84);
     UIManager.put("FileChooser.filesOfTypeLabelText", "Arquivos do Tipo");
     UIManager.put("FileChooser.upFolderToolTipText", "Um n\u00edvel acima");
     UIManager.put("FileChooser.upFolderAccessibleName", "Um n\u00edvel acima");
