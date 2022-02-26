@@ -6,6 +6,10 @@ import java.awt.Image;
 public class SimpleFrame extends JEscFrame {
   private static final long serialVersionUID = 1L;
 
+  public SimpleFrame(String title) {
+    super(title);
+  }
+
   public SimpleFrame(String title, Image icon) {
     super(title);
     super.setIconImage(icon);

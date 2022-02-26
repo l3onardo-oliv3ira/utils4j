@@ -6,7 +6,11 @@ import java.awt.Image;
 public class SimpleDialog extends JEscDialog {
   
   private static final long serialVersionUID = 1L;
-
+  
+  public SimpleDialog(String title) {
+    super((Frame)null, title);
+  }
+  
   public SimpleDialog(String title, Image icon) {
     this((Frame)null, title, icon);
   }
