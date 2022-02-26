@@ -14,7 +14,7 @@ import org.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import com.github.utils4j.IProviderInstaller;
 
 @SuppressWarnings("restriction")
-public enum ProviderInstaller implements IProviderInstaller{
+public enum ProviderInstaller implements IProviderInstaller {
 
   JSR105(){
     private final String JSR_105_PROVIDER = "XMLDSig"; //org.jcp.xml.dsig.internal.dom.XMLDSigRI
@@ -38,6 +38,7 @@ public enum ProviderInstaller implements IProviderInstaller{
     @Override
     public Provider install(String providerName, Object config) {
       Args.requireText(providerName, "provider name is empty");
+      Args.requireNonNull(config, "config is null");
       final String sunProviderName = "SunPKCS11-" + providerName;
       return setup(sunProviderName, () -> SunPKCS11Creator.create(config.toString()));
     }

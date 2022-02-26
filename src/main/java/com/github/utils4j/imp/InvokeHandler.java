@@ -13,7 +13,7 @@ public abstract class InvokeHandler<E extends Throwable> {
   }
 
   public final <T> T invoke(Supplier<T> tryBlock, Runnable finallyBlock) throws E {
-    return invoke(tryBlock, (t) -> {}, finallyBlock);
+    return invoke(tryBlock, (e) -> {}, finallyBlock);
   }
     
   public final <T> T invoke(Supplier<T> tryBlock, Consumer<Throwable> catchBlock) throws E {
