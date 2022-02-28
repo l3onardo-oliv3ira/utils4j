@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
@@ -54,5 +55,9 @@ public class Containers {
 
   public static boolean isEmpty(byte[] value) {
     return value == null || value.length == 0;    
+  }
+
+  public static <T> List<T> arrayList(T... array) {
+    return new ArrayList<T>(Arrays.asList(array));
   }
 }
