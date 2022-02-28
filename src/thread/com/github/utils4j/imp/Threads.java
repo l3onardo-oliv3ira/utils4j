@@ -35,14 +35,16 @@ public class Threads {
     } while (done < millis);
   }
 
-  public static void async(Runnable runnable) {
-    async("From:" + Thread.currentThread().getName(), runnable);
+  public static Thread startAsync(Runnable runnable) {
+    return startAsync("From:" + Thread.currentThread().getName(), runnable);
   }
   
-  public static void async(String threadName, Runnable runnable) {
-    if (runnable != null) {
-      new Thread(runnable, threadName).start();
-    }
+  public static Thread startAsync(String threadName, Runnable runnable) {
+    Args.requireText(threadName, "threadName is empty");
+    Args.requireNonNull(runnable, "runnable is null");
+    Thread t = new Thread(runnable, threadName);
+    t.start();
+    return t;
   }
   
   public static ShutdownHookThread shutdownHook(Runnable runnable) {
@@ -50,6 +52,8 @@ public class Threads {
   }
   
   public static ShutdownHookThread shutdownHookAdd(Runnable runnable, String name) {
+    Args.requireText(name, "threadName is empty");
+    Args.requireNonNull(runnable, "runnable is null");
     ShutdownHookThread t = new ShutdownHookThread(name, runnable);
     Runtime.getRuntime().addShutdownHook(t);
     return t;

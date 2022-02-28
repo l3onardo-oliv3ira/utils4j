@@ -270,18 +270,34 @@ public final class Strings {
     return r;
   }
 
-  public static String leftFill(long in, int minCount, char fillWith) {
-    return leftFill(Long.toString(in), minCount, fillWith);
+  public static String padStart(long in, int minLength) {
+    return padStart(Long.toString(in), minLength, '0');
   }
 
-  public static String leftFill(String in, int minCount, char fillWith) {
-    int length;
-    if ((length = in.length()) > minCount)
-      return in;
-    length -= minCount;
-    while (length++ < 0)
-      in = fillWith + in;
-    return in;
+  public static String padStart(String input, int minLength, char padChar) {
+    final int length;
+    if ((length = input.length()) >= minLength) {
+      return input;
+    }
+    StringBuilder sb = new StringBuilder(minLength);
+    for(int i = length; i < minLength; i++) {
+      sb.append(padChar);
+    }
+    sb.append(input);
+    return sb.toString();
+  }
+  
+  public static String padEnd(String input, int minLength, char padChar) {
+    final int length;
+    if ((length = input.length()) >= minLength) {
+      return input;
+    }
+    StringBuilder sb = new StringBuilder(minLength);
+    sb.append(input);
+    for (int i = length; i < minLength; i++) {
+      sb.append(padChar);
+    }
+    return sb.toString();
   }
 
   public static Set<String> stringSet(Collection<?> container) {

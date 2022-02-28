@@ -19,8 +19,8 @@ public class JsonTextReader implements ITextReader {
   }
   
   public JsonTextReader(Class<?> clazz, Charset charset) {
-    this.clazz = requireNonNull(clazz, "clazz is null");
-    this.charset = requireNonNull(charset, "charset is null");
+    this.clazz = Args.requireNonNull(clazz, "clazz is null");
+    this.charset = Args.requireNonNull(charset, "charset is null");
   }
 
   

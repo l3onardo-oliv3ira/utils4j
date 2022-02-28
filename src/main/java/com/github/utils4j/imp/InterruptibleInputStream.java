@@ -2,6 +2,7 @@ package com.github.utils4j.imp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 
 public class InterruptibleInputStream extends InputStream {
 
@@ -30,7 +31,7 @@ public class InterruptibleInputStream extends InputStream {
         }
       }
     Thread.currentThread().interrupt();
-    throw new IOException("Thread interrupted while reading");
+    throw new InterruptedIOException("Thread interrupted while reading");
   }
 
   @Override
@@ -52,7 +53,7 @@ public class InterruptibleInputStream extends InputStream {
           Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
           Thread.currentThread().interrupt();
-          throw new IOException("Thread interrupted while reading");
+          throw new InterruptedIOException("Thread interrupted while reading");
         }
       }
     }
