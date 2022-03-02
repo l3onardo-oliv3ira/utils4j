@@ -5,9 +5,15 @@ import static com.github.utils4j.imp.Throwables.tryRuntime;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import java.awt.Dimension;
+import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import com.github.utils4j.imp.function.Procedure;
@@ -52,5 +58,21 @@ public class SwingTools {
         return ofNullable(ref.get());
       };
     return tryCall(p, empty());
+  }
+  
+  public static void setFixedMinimumSize(Window window, Dimension dimension) {
+    Args.requireNonNull(window, "panel is null");
+    Args.requireNonNull(dimension, "dimension is null");
+    window.setMinimumSize(dimension);
+    window.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        Dimension windowDimension = window.getSize();
+        Dimension minimumDimension = window.getMinimumSize();
+        windowDimension.width = Math.max(windowDimension.width, minimumDimension.width);
+        windowDimension.height =  Math.max(windowDimension.height, minimumDimension.height);
+        window.setSize(windowDimension);
+      }
+    });    
   }
 }

@@ -1,4 +1,4 @@
-package com.github.utils4j.imp;
+package com.github.utils4j.gui;
 
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+
+import com.github.utils4j.imp.Throwables;
 
 public interface IPicture {
 

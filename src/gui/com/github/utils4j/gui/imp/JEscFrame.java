@@ -1,4 +1,4 @@
-package com.github.utils4j.imp;
+package com.github.utils4j.gui.imp;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.event.ActionEvent;
