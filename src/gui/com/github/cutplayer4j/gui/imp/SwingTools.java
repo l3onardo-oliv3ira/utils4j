@@ -1,4 +1,4 @@
-package com.github.utils4j.imp;
+package com.github.cutplayer4j.gui.imp;
 
 import static com.github.utils4j.imp.Throwables.tryCall;
 import static com.github.utils4j.imp.Throwables.tryRuntime;
@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.SwingUtilities;
 
+import com.github.utils4j.imp.Args;
 import com.github.utils4j.imp.function.Procedure;
 import com.github.utils4j.imp.function.Supplier;
 
