@@ -1,4 +1,4 @@
-package com.github.cutplayer4j.gui.imp;
+package com.github.utils4j.gui.imp;
 
 import static com.github.utils4j.imp.Throwables.tryCall;
 import static com.github.utils4j.imp.Throwables.tryRuntime;
