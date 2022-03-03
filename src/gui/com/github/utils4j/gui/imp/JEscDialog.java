@@ -5,6 +5,7 @@ import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
@@ -70,9 +71,10 @@ public class JEscDialog extends JDialog {
     super(owner, title, modalityType, gc);
   }
 
+  @Override
   protected JRootPane createRootPane() {
     JRootPane rootPane = new JRootPane();
-    KeyStroke stroke = KeyStroke.getKeyStroke(27, 0);
+    KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
     rootPane.getInputMap(2).put(stroke, "escapeKey");
     rootPane.getActionMap().put("escapeKey", new AbstractAction() {
       private static final long serialVersionUID = 1L;
