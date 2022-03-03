@@ -339,9 +339,12 @@ public final class Strings {
     return out.toString();
   }
 
-
   public static String defaultLatin(String in) {
-    return latinise(in, false, false, Integer.MAX_VALUE);
+    return defaultLatin(in, Integer.MAX_VALUE);
+  }
+
+  public static String defaultLatin(String in, int maxTextSize) {
+    return latinise(in, false, false, maxTextSize);
   }
 
   public static String latinise(String in) {
