@@ -12,8 +12,6 @@ import java.awt.event.ComponentEvent;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import com.github.utils4j.imp.function.Procedure;
