@@ -1,40 +1,40 @@
 package com.github.utils4j.imp;
 
-public final class Retryable {
+public final class Retryable<T> {
   
-  public static void attempt(long interval, long timeout, Executable exec) throws RetryTimeoutException, Exception{
-    attempt(0L, interval, timeout, exec);
+  public static <T> T attempt(long interval, long timeout, Executable<T> exec) throws RetryTimeoutException, Exception{
+    return attempt(0L, interval, timeout, exec);
   }
   
-  public static void attempt(long delay, long interval, long timeout, Executable exec) throws RetryTimeoutException, Exception{
-    new Retryable(exec).execute(delay, interval, timeout);
+  public static <T> T attempt(long delay, long interval, long timeout, Executable<T> exec) throws RetryTimeoutException, Exception{
+    return new Retryable<T>(exec).execute(delay, interval, timeout);
   }
 
   @FunctionalInterface
-  public static interface Executable {
-    void execute() throws TemporaryException, Exception;
+  public static interface Executable<T> {
+    T execute() throws TemporaryException, Exception;
   }
   
-  private final Executable executable;
+  private final Executable<T> executable;
   
-  private Retryable(Executable executable) {
+  private Retryable(Executable<T> executable) {
     this.executable = executable;
   }
 
-  private void execute(long delay, long interval, long timeout) throws RetryTimeoutException, Exception {
+  private T execute(long delay, long interval, long timeout) throws RetryTimeoutException, Exception {
     long start = System.currentTimeMillis();
     if (delay > 0L)
       Threads.sleep(delay);
     do {
       try {
-        executable.execute();
-        return;
+        return executable.execute();
       } catch (TemporaryException e) {
-        if (System.currentTimeMillis() - start < timeout)
+        if (System.currentTimeMillis() - start < timeout) {
           Threads.sleep(interval);
-        else
-          throw new RetryTimeoutException(e);
+          continue;
+        }
+        throw new RetryTimeoutException(e);
       }
-    } while (true);
+    } while(true);
   }
 }

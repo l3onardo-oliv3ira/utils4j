@@ -94,9 +94,15 @@ public class Args {
   public static Path requireExists(Path path, String message) {
     return requireExists(path, message, LinkOption.NOFOLLOW_LINKS);
   }
-  
+
+  public static Path requireFolderExists(Path path, String message) {
+    if (!requireExists(path, message, LinkOption.NOFOLLOW_LINKS).toFile().isDirectory())
+      throw new IllegalArgumentException(message);
+    return path;
+  }
+
   public static Path requireExists(Path path, String message, LinkOption options) {
-    if (!Files.exists(requireNonNull(path, message), options))
+    if (!Files.exists(Args.requireNonNull(path, message), options))
       throw new IllegalArgumentException(message);
     return path;
   }

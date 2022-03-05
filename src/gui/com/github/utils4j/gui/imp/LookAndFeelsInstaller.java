@@ -16,6 +16,13 @@ import com.github.utils4j.imp.Args;
 
 public final class LookAndFeelsInstaller {
 
+  /*
+   Metal
+CDE/Motif
+Nimbus
+Windows
+Windows Classic
+   * */
   private LookAndFeelsInstaller() {}
 
   public static void install(String looksAndFeelsName, Component root) {

@@ -5,15 +5,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public abstract class Directory {
   private Directory() {}
   
   public static void clean(Path path) throws IOException {
+    clean(path, (f) -> true);
+  }
+  
+  public static void clean(Path path, Predicate<File> predicate) throws IOException {
     try (Stream<Path> walk = Files.walk(path)) {        
       walk.sorted(Comparator.reverseOrder())
         .map(Path::toFile)
+        .filter(predicate)
         .peek(System.out::println)
         .forEach(File::delete);
     }

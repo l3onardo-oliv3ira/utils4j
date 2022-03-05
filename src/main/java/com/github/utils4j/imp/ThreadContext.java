@@ -1,10 +1,12 @@
 package com.github.utils4j.imp;
 
+import static com.github.utils4j.imp.Throwables.tryRun;
+
 import com.github.utils4j.IThreadContext;
 
 public abstract class ThreadContext implements IThreadContext {
 
-  private Thread context;
+  private volatile Thread context;
   private final String name;
   private final boolean deamon;
 
@@ -23,8 +25,22 @@ public abstract class ThreadContext implements IThreadContext {
     context = new Thread(name) {
       @Override
       public void run() {
-        beforeRun();
-        doRun();
+        try {
+          beforeRun();
+        } catch (Exception e) {
+          handleException(e);
+          return;
+        }
+        try {
+          doRun();
+        } catch(InterruptedException e) {
+          interrupt();
+        } catch (Exception e) {
+          handleException(e);
+        } finally {
+          tryRun(ThreadContext.this::afterRun);
+          context = null;
+        }
       }
     };
     context.setDaemon(deamon);
@@ -36,12 +52,10 @@ public abstract class ThreadContext implements IThreadContext {
     if (context != null) {
       context.interrupt();
       try {
-        doInterrupt();
         context.join(timeout);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       } finally {
-        onStoped();
         context = null;
       }
     }
@@ -52,11 +66,13 @@ public abstract class ThreadContext implements IThreadContext {
     stop(0);
   }
   
-  protected void beforeRun() {}
+  protected void beforeRun() throws Exception {}
 
-  protected void onStoped() {}
+  protected void afterRun() throws Exception {}
+  
+  protected void handleException(Throwable e) {
+    e.printStackTrace();
+  }
 
-  protected void doInterrupt() {}
-
-  protected abstract void doRun();
+  protected abstract void doRun() throws Exception;
 }

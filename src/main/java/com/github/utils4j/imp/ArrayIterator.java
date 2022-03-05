@@ -1,8 +1,8 @@
 package com.github.utils4j.imp;
 
-import com.github.utils4j.ResetableIterator;
+import com.github.utils4j.IResetableIterator;
 
-public class ArrayIterator<T> implements ResetableIterator<T> {
+public class ArrayIterator<T> implements IResetableIterator<T> {
   private int current = 0;
   private T[] array;
   
