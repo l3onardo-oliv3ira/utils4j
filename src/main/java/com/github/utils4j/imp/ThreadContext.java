@@ -19,6 +19,10 @@ public abstract class ThreadContext implements IThreadContext {
     this.name = name;
   }
 
+  protected void checkIsAlive() {
+    States.requireTrue(context != null, "context not available");
+  }
+  
   @Override
   public final synchronized void start() {
     stop();
@@ -28,6 +32,7 @@ public abstract class ThreadContext implements IThreadContext {
         try {
           beforeRun();
         } catch (Exception e) {
+          context = null;
           handleException(e);
           return;
         }

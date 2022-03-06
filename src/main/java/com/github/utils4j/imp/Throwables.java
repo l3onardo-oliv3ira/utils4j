@@ -160,16 +160,24 @@ public class Throwables {
   public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, T defaultIfFail) {
     return tryCall(procedure, defaultIfFail, false);
   }
+  
+  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, T defaultIfFail, Runnable finallyBlock) {
+    return tryCall(procedure, defaultIfFail, false, finallyBlock);
+  }
+  
+  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, T defaultIfFail, boolean logQuietly, Runnable finallyBlock) {
+    return tryCall(procedure, (Supplier<T>)() -> defaultIfFail, logQuietly, finallyBlock);
+  }
 
   public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, Supplier<T> defaultIfFail) {
-    return tryCall(procedure, defaultIfFail, false);
+    return tryCall(procedure, defaultIfFail, false, () -> {});
   }
 
   public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, T defaultIfFail, boolean logQuietly) {
-    return tryCall(procedure, (Supplier<T>)() -> defaultIfFail, logQuietly);
+    return tryCall(procedure, (Supplier<T>)() -> defaultIfFail, logQuietly, () -> {});
   }
   
-  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, Supplier<T> defaultIfFail, boolean logQuietly) {
+  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, Supplier<T> defaultIfFail, boolean logQuietly, Runnable finallyBlock) {
     try {
       return procedure.call();
     }catch(Exception e) {
@@ -177,6 +185,8 @@ public class Throwables {
         LOGGER.warn("tryCall fail", e);
       }
       return defaultIfFail.get();
+    }finally {
+      finallyBlock.run();
     }
   }
 

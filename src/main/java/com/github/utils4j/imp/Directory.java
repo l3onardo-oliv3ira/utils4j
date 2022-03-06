@@ -20,8 +20,18 @@ public abstract class Directory {
       walk.sorted(Comparator.reverseOrder())
         .map(Path::toFile)
         .filter(predicate)
-        .peek(System.out::println)
         .forEach(File::delete);
+    }
+  }
+  
+  public static void requireFolder(Path path) throws IOException {
+    Args.requireNonNull(path, "path is null");
+    File f = path.toFile();
+    if (f.exists() && f.isDirectory())
+      return;
+    f.delete();
+    if (!f.mkdirs()) {
+      throw new IOException("Unabled to create folder " + f.getAbsolutePath());
     }
   }
 }

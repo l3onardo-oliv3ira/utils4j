@@ -3,12 +3,11 @@ package com.github.utils4j.imp;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.utils4j.IConstants;
 import com.github.utils4j.ITextReader;
 
 public class JsonTextReader implements ITextReader {
-
+  
   private final Class<?> clazz;
   private final Charset charset;
   
@@ -25,6 +24,6 @@ public class JsonTextReader implements ITextReader {
   @Override
   @SuppressWarnings("unchecked")
   public <T> T read(String text) throws IOException {
-    return (T) new ObjectMapper().readValue(text.getBytes(charset), clazz); 
+    return (T) JsonTools.mapper().readValue(text.getBytes(charset), clazz); 
   }
 }

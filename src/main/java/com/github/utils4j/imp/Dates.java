@@ -39,7 +39,7 @@ public class Dates {
   }
   
   public static String stringNow() {
-    return format("yyyy_MM_dd_HH'h'mm'm'ss's'S'ms'", new Date());
+    return format("yyyy-MM-dd_HH'h'mm'm'ss's'S'ms'", new Date());
   }
   
   public static String defaultFormat(Date date) {
