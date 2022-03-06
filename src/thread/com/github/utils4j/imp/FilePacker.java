@@ -18,7 +18,7 @@ import com.github.utils4j.IFilePacker;
 
 public class FilePacker extends ThreadContext implements IFilePacker {
   
-  private static final long TIMEOUT_TIMER = 500;
+  private static final long TIMEOUT_TIMER = 750;
 
   private final Path folderWatching;
 
