@@ -143,5 +143,34 @@ public class Args {
       throw new IllegalArgumentException(message);
     return input;
   }
+
+  public static long requireLong(String value, String message) {
+    if (!Strings.isLong(value))
+      throw new IllegalArgumentException(message);
+    return Long.valueOf(value);
+  }
   
+  public static int requireInt(String value, String message) {
+    if (!Strings.isInt(value))
+      throw new IllegalArgumentException(message);
+    return Integer.valueOf(value);
+  }
+  
+  public static float requireFloat(String value, String message) {
+    if (!Strings.isFloat(value))
+      throw new IllegalArgumentException(message);
+    return Float.valueOf(value);
+  }
+
+  public static double requireDouble(String value, String message) {
+    if (!Strings.isDouble(value))
+      throw new IllegalArgumentException(message);
+    return Double.valueOf(value);
+  }
+
+  public static boolean requireBoolean(String value, String message) {
+    if (!Strings.isBoolean(value))
+      throw new IllegalArgumentException(message);
+    return Boolean.valueOf(value);
+  }
 }

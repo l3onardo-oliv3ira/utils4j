@@ -10,6 +10,8 @@ import com.github.utils4j.IParams;
 
 public class Params implements IParams {
   
+  public static final String DEFAULT_KEY = Params.class.getSimpleName();
+  
   public static final Params EMPTY = new Params() {
     @Override
     public Params of(String name, Object value) {

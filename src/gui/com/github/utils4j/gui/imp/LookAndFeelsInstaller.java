@@ -25,9 +25,12 @@ Windows Classic
    * */
   private LookAndFeelsInstaller() {}
 
+  public static void install(String looksAndFeelsName) { 
+    install(looksAndFeelsName, null);
+  }
+  
   public static void install(String looksAndFeelsName, Component root) {
     Args.requireNonNull(looksAndFeelsName, "looksAndFeels is null");
-    Args.requireNonNull(root, "root is null");
     
     LookAndFeel laf = getLookAndFeel();
 
@@ -48,6 +51,8 @@ Windows Classic
       tryRuntime(() -> setLookAndFeel(getSystemLookAndFeelClassName())); 
     }
     
-    updateComponentTreeUI(root);
+    if (root != null) {
+      updateComponentTreeUI(root);
+    }
   }
 }

@@ -18,7 +18,7 @@ import com.github.utils4j.IFilePacker;
 
 public class FilePacker extends ThreadContext implements IFilePacker {
   
-  private static final long TIMEOUT_TIMER = 750;
+  private static final long TIMEOUT_TIMER = 1000;
 
   private final Path folderWatching;
 
@@ -78,8 +78,8 @@ public class FilePacker extends ThreadContext implements IFilePacker {
   
   private void pack(File file) {
     if (!file.isDirectory()) {
-      pathPool.add(file);
       startTime = System.currentTimeMillis();
+      pathPool.add(file);
     }
   }
 
