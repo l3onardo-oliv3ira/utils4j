@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.utils4j.IFilePacker;
 
-public class FilePacker extends ThreadContext implements IFilePacker {
+public class FilePacker<E extends Exception> extends ThreadContext<E> implements IFilePacker<E> {
   
   private static final long TIMEOUT_TIMER = 2000;
 

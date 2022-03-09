@@ -2,9 +2,9 @@ package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Throwables.tryRun;
 
-import com.github.utils4j.IThreadContext;
+import com.github.utils4j.ILifeCycle;
 
-public abstract class ThreadContext implements IThreadContext {
+public abstract class ThreadContext<E extends Exception> implements ILifeCycle<E> {
 
   private volatile Thread context;
   private final String name;
@@ -19,12 +19,17 @@ public abstract class ThreadContext implements IThreadContext {
     this.name = name;
   }
 
+  @Override
+  public final boolean isStarted() {
+    return context != null;
+  }
+  
   protected void checkIsAlive() {
     States.requireTrue(context != null, "context not available");
   }
   
   @Override
-  public final synchronized void start() {
+  public final synchronized void start() throws E {
     stop();
     context = new Thread(name) {
       @Override
@@ -51,9 +56,14 @@ public abstract class ThreadContext implements IThreadContext {
     context.setDaemon(deamon);
     context.start();
   }
+  
+  @Override
+  public final void stop() throws E {
+    stop(0);
+  }
 
   @Override
-  public final synchronized void stop(long timeout) {
+  public final synchronized void stop(long timeout) throws E {
     if (context != null) {
       context.interrupt();
       try {
@@ -66,11 +76,6 @@ public abstract class ThreadContext implements IThreadContext {
     }
   }
 
-  @Override
-  public final void stop() {
-    stop(0);
-  }
-  
   protected void beforeRun() throws Exception {}
 
   protected void afterRun() throws Exception {}

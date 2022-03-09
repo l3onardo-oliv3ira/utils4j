@@ -5,7 +5,7 @@ import static com.github.utils4j.imp.Throwables.tryRun;
 public class Threads {
   private Threads(){}
   
-  public static void sleep(long time){
+  public static void sleep(long time) {
     if (time > 0)
       try {
         Thread.sleep(time);
