@@ -18,10 +18,10 @@ import com.github.utils4j.IFilePacker;
 
 public class FilePacker extends ThreadContext implements IFilePacker {
   
-  private static final long TIMEOUT_TIMER = 1000;
+  private static final long TIMEOUT_TIMER = 2000;
 
   private final Path folderWatching;
-
+  
   private WatchService watchService;
 
   private List<File> pathPool = new LinkedList<File>();
@@ -80,7 +80,11 @@ public class FilePacker extends ThreadContext implements IFilePacker {
     if (!file.isDirectory()) {
       startTime = System.currentTimeMillis();
       pathPool.add(file);
+      onPacked(file);
     }
+  }
+
+  protected void onPacked(File file) {
   }
 
   @Override
@@ -145,6 +149,11 @@ public class FilePacker extends ThreadContext implements IFilePacker {
     synchronized(availableFiles) {
       availableFiles.add(block);
       availableFiles.notifyAll();
+      onAvailable(block);
     }
+  }
+
+  protected void onAvailable(List<File> block) {
+    
   }
 }
