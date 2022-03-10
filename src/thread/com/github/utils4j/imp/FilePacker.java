@@ -66,7 +66,7 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   }
 
   private void cleanFolder() {
-    tryRun(() -> Directory.clean(folderWatching, f -> f.isFile()));
+    tryRun(() -> Directory.clean(folderWatching, f -> f.isFile() && !".gitignore".equals(f.getName())));
   }
 
   private void closeService() {
