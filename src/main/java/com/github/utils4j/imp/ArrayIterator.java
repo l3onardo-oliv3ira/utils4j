@@ -1,5 +1,7 @@
 package com.github.utils4j.imp;
 
+import java.util.NoSuchElementException;
+
 import com.github.utils4j.IResetableIterator;
 
 public class ArrayIterator<T> implements IResetableIterator<T> {
@@ -18,7 +20,7 @@ public class ArrayIterator<T> implements IResetableIterator<T> {
   @Override
   public final T next() {
     if (current == array.length)
-      return null;
+      throw new NoSuchElementException();
     return array[current++];
   }
 
