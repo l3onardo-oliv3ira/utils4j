@@ -104,7 +104,7 @@ public class Throwables {
     if (rootCause == null)
       return "Causa desconhecida";
     String message = rootCause.getClass().getName();
-    return message + text(rootCause.getMessage(), "Causa desconhecida");
+    return message + ": " + text(rootCause.getMessage(), "Causa desconhecida");
   }
   
   public static String rootString(Throwable throwable) {

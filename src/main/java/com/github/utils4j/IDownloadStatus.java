@@ -9,13 +9,13 @@ public interface IDownloadStatus {
   
   OutputStream onNewTry(int attemptCount) throws IOException;
   
-  void onStartDownload(long total);
+  void onStartDownload(long total) throws InterruptedException;
   
-  void onEndDownload();
+  void onEndDownload() throws InterruptedException;
   
-  void onStatus(long total, long written);
+  void onStatus(long total, long written) throws InterruptedException;
 
-  void onDownloadFail(Throwable e);
+  void onDownloadFail(Throwable e) throws InterruptedException;
 
   Optional<File> getDownloadedFile();
 }

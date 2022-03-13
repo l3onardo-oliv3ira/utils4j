@@ -1,39 +1,28 @@
 package com.github.utils4j.imp;
 
-import static com.github.utils4j.imp.Streams.closeQuietly;
-import static java.nio.file.Files.createTempFile;
+import static com.github.utils4j.imp.Throwables.tryCall;
+import static java.io.File.createTempFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.function.Supplier;
 
 import com.github.utils4j.IDownloadStatus;
 
 public class DownloadStatus implements IDownloadStatus {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DownloadStatus.class);
-  
   private File file;
-  
+
   private boolean online = false;
   
   private final boolean rejectEmpty;
   
-  private OutputStream out;
-  
-  public DownloadStatus() {
-    this(false);
-  }
+  private final Optional<File> saveAs;
 
-  public DownloadStatus(boolean rejectEmpty) {
-    this.rejectEmpty = rejectEmpty;
-  }
+  private OutputStream out;
 
   private void checkIfOffline() {
     throwIfOnlineIs(true, "status is online");
@@ -48,12 +37,25 @@ public class DownloadStatus implements IDownloadStatus {
       throw new IllegalStateException(message);
     }
   }
+  
+  public DownloadStatus() {
+    this(true, null);
+  }
+  
+  public DownloadStatus(File saveAs) {
+    this(true, saveAs);
+  }
+
+  public DownloadStatus(boolean rejectEmpty, File saveAs) {
+    this.rejectEmpty = rejectEmpty;
+    this.saveAs = Optional.ofNullable(saveAs);
+  }
 
   @Override
-  public OutputStream onNewTry(int attemptCount) throws IOException {
+  public final OutputStream onNewTry(int attemptCount) throws IOException {
     checkIfOffline();
-    LOGGER.debug("Tentativa {} de download", attemptCount);
-    out = new FilterOutputStream(new FileOutputStream(file = createTempFile("downloaded_tmp", ".signer4j.tmp").toFile())) {
+    Supplier<File> fallback = () -> tryCall(() -> createTempFile("downloaded_tmp", ".signer4j.tmp"), new File(""));
+    out = new FileOutputStream(file = saveAs.orElseGet(fallback)) {
       @Override
       public void close() throws IOException {
         try {
@@ -70,30 +72,28 @@ public class DownloadStatus implements IDownloadStatus {
   }
 
   @Override
-  public void onStartDownload(long total) {
+  public final void onStartDownload(long total) throws InterruptedException {
     checkIfOnline();
-    LOGGER.info("Iniciando o download. Tamanho do arquivo: {}", total);
+    onStepStart(total);
+  }
+  
+  @Override
+  public final void onStatus(long total, long written) throws InterruptedException {
+    checkIfOnline();
+    onStepStatus(written);
   }
 
   @Override
-  public void onStatus(long total, long written) {
-    checkIfOnline();
-    double percent = 100D * written / total;
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Baixados %.2f%%\"", percent);
-    }
-  }
-
-  @Override
-  public void onDownloadFail(Throwable e)  {
-    onEndDownload();
+  public final void onDownloadFail(Throwable e) throws InterruptedException  {
+    Streams.closeQuietly(out);
     checkIfEmpty(true);
+    onStepFail(e);
   }
 
   @Override
-  public void onEndDownload() {
-    checkIfOnline();
-    closeQuietly(out);
+  public final void onEndDownload() throws InterruptedException {
+    Streams.closeQuietly(out);
+    onStepEnd();
   }
 
   private void checkIfEmpty(boolean force) {
@@ -110,4 +110,13 @@ public class DownloadStatus implements IDownloadStatus {
     checkIfOffline();
     return Optional.ofNullable(file);
   }
+
+  protected void onStepStart(long total) throws InterruptedException {}
+  
+  protected void onStepStatus(long written) throws InterruptedException { }
+  
+  protected void onStepEnd() throws InterruptedException {}
+  
+  protected void onStepFail(Throwable e) throws InterruptedException {}
+
 }

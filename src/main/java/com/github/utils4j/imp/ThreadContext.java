@@ -46,7 +46,7 @@ public abstract class ThreadContext<E extends Exception> implements ILifeCycle<E
         } catch(InterruptedException e) {
           interrupt();
         } catch (Exception e) {
-          handleException(e);
+          tryRun(() -> ThreadContext.this.handleException(e));
         } finally {
           tryRun(ThreadContext.this::afterRun);
           context = null;

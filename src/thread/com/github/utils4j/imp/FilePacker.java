@@ -39,6 +39,7 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   public void reset() {
     cleanFolder();
     synchronized(availableFiles) {
+      availableFiles.forEach(List::clear);
       availableFiles.clear();
     }
   }
@@ -109,40 +110,36 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   }
 
   @Override
-  protected void doRun() {
+  protected void doRun() throws Exception {
     WatchKey key;
-    try {
-      do {
-        while((key = watchService.poll(250, TimeUnit.MILLISECONDS)) == null) {
-          if (!pathPool.isEmpty() && hasTimeout()) {
-            makeBlocksAvailable(block());
-          }
-        }
-        try {
-          for (WatchEvent<?> e : key.pollEvents()) {
-            if (e.count() <= 1) {
-              @SuppressWarnings("unchecked")
-              final WatchEvent<Path> event = (WatchEvent<Path>) e;
-              final Path folder = (Path)key.watchable();
-              final Path fileName = event.context();
-              final Path file = folder.resolve(fileName);
-              pack(file.toFile());
-            }         
-          }
-         
-          if (pathPool.isEmpty() || !hasTimeout()) {
-            continue;
-          }
+    do {
+      while((key = watchService.poll(250, TimeUnit.MILLISECONDS)) == null) {
+        if (!pathPool.isEmpty() && hasTimeout()) {
           makeBlocksAvailable(block());
-
-        }finally {
-          key.reset();
         }
-        
-      } while(true);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+      }
+      try {
+        for (WatchEvent<?> e : key.pollEvents()) {
+          if (e.count() <= 1) {
+            @SuppressWarnings("unchecked")
+            final WatchEvent<Path> event = (WatchEvent<Path>) e;
+            final Path folder = (Path)key.watchable();
+            final Path fileName = event.context();
+            final Path file = folder.resolve(fileName);
+            pack(file.toFile());
+          }         
+        }
+       
+        if (pathPool.isEmpty() || !hasTimeout()) {
+          continue;
+        }
+        makeBlocksAvailable(block());
+
+      }finally {
+        key.reset();
+      }
+      
+    } while(true);
   }
 
   private void makeBlocksAvailable(List<File> block) throws InterruptedException {
