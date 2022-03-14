@@ -7,10 +7,7 @@ import java.util.Optional;
 import com.github.utils4j.IParam;
 import com.github.utils4j.IParams;
 
-
 public class Params implements IParams {
-  
-  public static final String DEFAULT_KEY = Params.class.getSimpleName();
   
   public static final Params EMPTY = new Params() {
     @Override
@@ -37,7 +34,7 @@ public class Params implements IParams {
     this.params = params;
   }
 
-  public Params of(String name, Optional<?>value) {
+  public Params of(String name, Optional<?> value) {
     params.put(name, ParamImp.of(name, value.orElse(null)));
     return this;
   }

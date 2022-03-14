@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 
 import com.github.utils4j.IParam;
 
-
 class ParamImp implements IParam {
 
   static final IParam NULL = new ParamImp(null);
