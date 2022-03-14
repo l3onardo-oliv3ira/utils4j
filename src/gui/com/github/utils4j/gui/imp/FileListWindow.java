@@ -1,6 +1,8 @@
 package com.github.utils4j.gui.imp;
 
 import static com.github.utils4j.gui.imp.SwingTools.setFixedMinimumSize;
+import static com.github.utils4j.imp.Strings.empty;
+import static com.github.utils4j.imp.Strings.trim;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -64,6 +66,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
 
   private void createSouth() {
     defaultBorder = fileName.getBorder();
+    fileName.setText(empty());
     fileName.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
@@ -149,16 +152,17 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     int option = JOptionPane.showConfirmDialog(null, "Deseja mesmo cancelar a operação?", "Cancelamento da operação",
         JOptionPane.YES_NO_OPTION);
     if (option == JOptionPane.YES_OPTION) {
-      this.fileName.setText(null);
+      this.fileName.setText(empty());
       this.close();
     }
   }
 
   private void onSave(ActionEvent e) {
-    Optional<String> fileName = Strings.optional(this.fileName.getText());
+    Optional<String> fileName = Strings.optional(trim(this.fileName.getText()).replaceAll("[\\\\/:*?\"<>|]", empty()));
     if (fileName.isPresent()) {
       close();
     } else {
+      this.fileName.setText("");
       this.fileName.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
     }
   }
