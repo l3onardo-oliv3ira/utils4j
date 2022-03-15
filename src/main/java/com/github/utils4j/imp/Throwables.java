@@ -107,13 +107,23 @@ public class Throwables {
     return message + ": " + text(rootCause.getMessage(), "Causa desconhecida");
   }
   
-  public static String rootString(Throwable throwable) {
+  public static String traceRoot(Throwable throwable) {
     Throwable rootCause = rootCause(throwable);
     if (rootCause == null)
       return "Causa desconhecida";
     StringWriter w = new StringWriter();
     try(PrintWriter p = new PrintWriter(w)){
       rootCause.printStackTrace(p);
+      return w.toString();
+    }
+  }
+
+  public static String stackTrace(Throwable throwable) {
+    if (throwable == null)
+      return "Causa desconhecida";
+    StringWriter w = new StringWriter();
+    try(PrintWriter p = new PrintWriter(w)){
+      throwable.printStackTrace(p);
       return w.toString();
     }
   }

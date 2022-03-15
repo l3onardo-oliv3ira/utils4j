@@ -20,7 +20,7 @@ public class DownloadStatus implements IDownloadStatus {
   
   private final boolean rejectEmpty;
   
-  private final Optional<File> saveAs;
+  private final Optional<File> saveAt;
 
   private OutputStream out;
 
@@ -46,16 +46,16 @@ public class DownloadStatus implements IDownloadStatus {
     this(true, saveAs);
   }
 
-  public DownloadStatus(boolean rejectEmpty, File saveAs) {
+  public DownloadStatus(boolean rejectEmpty, File saveAt) {
     this.rejectEmpty = rejectEmpty;
-    this.saveAs = Optional.ofNullable(saveAs);
+    this.saveAt = Optional.ofNullable(saveAt);
   }
 
   @Override
   public final OutputStream onNewTry(int attemptCount) throws IOException {
     checkIfOffline();
     Supplier<File> fallback = () -> tryCall(() -> createTempFile("downloaded_tmp", ".signer4j.tmp"), new File(""));
-    out = new FileOutputStream(file = saveAs.orElseGet(fallback)) {
+    out = new FileOutputStream(file = saveAt.orElseGet(fallback)) {
       @Override
       public void close() throws IOException {
         try {

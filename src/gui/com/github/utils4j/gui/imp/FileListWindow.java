@@ -1,7 +1,9 @@
 package com.github.utils4j.gui.imp;
 
+import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
 import static com.github.utils4j.gui.imp.SwingTools.setFixedMinimumSize;
 import static com.github.utils4j.imp.Strings.empty;
+import static com.github.utils4j.imp.Strings.optional;
 import static com.github.utils4j.imp.Strings.trim;
 
 import java.awt.BorderLayout;
@@ -46,6 +48,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   private static final int MIN_HEIGHT = 250;
 
   private JTextField fileName = new JTextField();
+  private Border defaultBorder = fileName.getBorder();
   private JTable table;
   private FileTableModel tableModel;
 
@@ -53,37 +56,16 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     super("Ordem dos arquivos", icon, true);
     Args.requireNonEmpty(files, "files is empty");
     setLayout(new BorderLayout());
+    setupFieldName();
     createCenter(files);
     createEast();
     createSouth();
-    //pack();
     setSize(new Dimension(650, 300));
     setFixedMinimumSize(this, new Dimension(MIN_WIDTH, MIN_HEIGHT));
     setLocationRelativeTo(null);
   }
 
-  private Border defaultBorder;
-
   private void createSouth() {
-    defaultBorder = fileName.getBorder();
-    fileName.setText(empty());
-    fileName.getDocument().addDocumentListener(new DocumentListener() {
-      @Override
-      public void insertUpdate(DocumentEvent e) {
-        fileName.setBorder(defaultBorder);
-      }
-
-      @Override
-      public void removeUpdate(DocumentEvent e) {
-        fileName.setBorder(defaultBorder);
-      }
-
-      @Override
-      public void changedUpdate(DocumentEvent e) {
-        fileName.setBorder(defaultBorder);
-      }
-    });
-
     JButton okButton = new JButton("Salvar");
     okButton.addActionListener(this::onSave);
     JButton cancelButton = new JButton("Cancelar");
@@ -158,7 +140,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   }
 
   private void onSave(ActionEvent e) {
-    Optional<String> fileName = Strings.optional(trim(this.fileName.getText()).replaceAll("[\\\\/:*?\"<>|]", empty()));
+    Optional<String> fileName = optional(trim(this.fileName.getText()).replaceAll("[\\\\/:*?\"<>|]", empty()));
     if (fileName.isPresent()) {
       close();
     } else {
@@ -172,27 +154,55 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   }
 
   private void onFirst(ActionEvent e) {
-    Pair<Integer, Integer> p = tableModel.sortFirst(selectedRows);
-    table.setRowSelectionInterval(p.getKey(), p.getValue());
-    scrollToVisible(p.getKey(), 0);
+    if (selectedRows.length > 0) {
+      Pair<Integer, Integer> p = tableModel.sortFirst(selectedRows);
+      table.setRowSelectionInterval(p.getKey(), p.getValue());
+      scrollToVisible(p.getKey(), 0);
+    }
   }
 
   private void onUp(ActionEvent e) {
-    Pair<Integer, Integer> p = tableModel.sortUp(selectedRows);
-    table.setRowSelectionInterval(p.getKey(), p.getValue());
-    scrollToVisible(p.getKey(), 0);
+    if (selectedRows.length > 0) {
+      Pair<Integer, Integer> p = tableModel.sortUp(selectedRows);
+      table.setRowSelectionInterval(p.getKey(), p.getValue());
+      scrollToVisible(p.getKey(), 0);
+    }
   }
 
   private void onDown(ActionEvent e) {
-    Pair<Integer, Integer> p = tableModel.sortDown(selectedRows);
-    table.setRowSelectionInterval(p.getKey(), p.getValue());
-    scrollToVisible(p.getValue(), 0);
+    if (selectedRows.length > 0) {
+      Pair<Integer, Integer> p = tableModel.sortDown(selectedRows);
+      table.setRowSelectionInterval(p.getKey(), p.getValue());
+      scrollToVisible(p.getValue(), 0);
+    }
   }
 
   private void onLast(ActionEvent e) {
-    Pair<Integer, Integer> p = tableModel.sortLast(selectedRows);
-    table.setRowSelectionInterval(p.getKey(), p.getValue());
-    scrollToVisible(p.getValue(), 0);
+    if (selectedRows.length > 0) {
+      Pair<Integer, Integer> p = tableModel.sortLast(selectedRows);
+      table.setRowSelectionInterval(p.getKey(), p.getValue());
+      scrollToVisible(p.getValue(), 0);
+    }
+  }
+  
+  private void setupFieldName() {
+    fileName.setText(empty());
+    fileName.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        fileName.setBorder(defaultBorder);
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        fileName.setBorder(defaultBorder);
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        fileName.setBorder(defaultBorder);
+      }
+    });
   }
 
   private static class SizeTableCellRenderer extends DefaultTableCellRenderer {
@@ -232,18 +242,17 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   }
 
   public static List<File> createListFiles() {
-    //C:\\Users\\Leonardo\\Desktop\\assinadoroffline\\livros
     return Containers
-        .arrayList(new File("D:\\temp").listFiles(new FilenameFilter() {
-          @Override
-          public boolean accept(File dir, String name) {
-            return name.endsWith(".pdf");
-          }
-        }));
+      .arrayList(new File("D:\\temp").listFiles(new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.endsWith(".pdf");
+        }
+      }));
   }
 
   public static void main(String[] args) {
-    SwingTools.invokeLater(() -> {
+    invokeLater(() -> {
       List<File> files = createListFiles();
       IFileListView window = new FileListWindow(Images.FIRST.asImage().get(), files);
       String fileName = window.getFileName().orElse("nada informado");
