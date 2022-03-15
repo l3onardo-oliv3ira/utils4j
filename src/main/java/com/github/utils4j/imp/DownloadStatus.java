@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import com.github.utils4j.IDownloadStatus;
 
@@ -54,8 +53,8 @@ public class DownloadStatus implements IDownloadStatus {
   @Override
   public final OutputStream onNewTry(int attemptCount) throws IOException {
     checkIfOffline();
-    Supplier<File> fallback = () -> tryCall(() -> createTempFile("downloaded_tmp", ".signer4j.tmp"), new File(""));
-    out = new FileOutputStream(file = saveAt.orElseGet(fallback)) {
+    file = saveAt.orElseGet(() -> tryCall(() -> createTempFile("downloaded_tmp", ".utils4j.tmp"), new File("*unabled to create temp file*")));
+    out = new FileOutputStream(file) {
       @Override
       public void close() throws IOException {
         try {
@@ -70,7 +69,7 @@ public class DownloadStatus implements IDownloadStatus {
     this.online = true;
     return out;
   }
-
+  
   @Override
   public final void onStartDownload(long total) throws InterruptedException {
     checkIfOnline();

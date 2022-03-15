@@ -87,6 +87,10 @@ public final class Strings {
     return needText(text, null);
   }
 
+  public static String textOrNull(Object t) {
+    return t == null ? null : textOrNull(t.toString());
+  }
+  
   public static String needText(String text, String defaultIfNull) {
     return !hasText(text) ? defaultIfNull : trim(text);
   }
