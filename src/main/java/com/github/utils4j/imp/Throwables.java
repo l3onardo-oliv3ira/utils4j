@@ -4,10 +4,13 @@ import static com.github.utils4j.imp.Strings.text;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +119,18 @@ public class Throwables {
       rootCause.printStackTrace(p);
       return w.toString();
     }
+  }
+  
+  public static Stream<Throwable> streamTrace(Throwable throwable) {
+    List<Throwable> list = new ArrayList<>();
+    while(throwable != null){
+      list.add(throwable);
+      Throwable rootCause = throwable.getCause();
+      if (rootCause == null || rootCause == throwable)
+        break;
+      throwable = rootCause;
+    }
+    return list.stream();    
   }
 
   public static String stackTrace(Throwable throwable) {

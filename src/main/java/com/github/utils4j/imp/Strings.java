@@ -54,11 +54,11 @@ public final class Strings {
   public static boolean isEmpty(String[] text) {
     return text == null || text.length == 0;
   }
-  
+
   public static boolean isNotEmpty(String[] text) {
     return !isEmpty(text);
   }
-  
+
   public static String[] emptyArray() {
     return EMPTY_ARRAY;
   }
@@ -90,7 +90,7 @@ public final class Strings {
   public static String textOrNull(Object t) {
     return t == null ? null : textOrNull(t.toString());
   }
-  
+
   public static String needText(String text, String defaultIfNull) {
     return !hasText(text) ? defaultIfNull : trim(text);
   }
@@ -226,7 +226,7 @@ public final class Strings {
     }
     return s.toString();
   }
-  
+
   public static StringBuilder computeTabs(int tabSize) {
     StringBuilder b = new StringBuilder(6);
     while(tabSize-- > 0)
@@ -290,7 +290,7 @@ public final class Strings {
     sb.append(input);
     return sb.toString();
   }
-  
+
   public static String padEnd(String input, int minLength, char padChar) {
     final int length;
     if ((length = input.length()) >= minLength) {
@@ -2669,7 +2669,6 @@ public final class Strings {
 
     return replaceEach(result, searchList, replacementList, repeat, timeToLive - 1);
   }
-
 
   public static String replaceEach(final String text, final String[] searchList, final String[] replacementList) {
     final int timeToLive = searchList == null ? 0 : searchList.length;
