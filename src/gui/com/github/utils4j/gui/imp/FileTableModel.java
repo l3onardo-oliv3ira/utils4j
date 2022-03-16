@@ -101,39 +101,4 @@ public class FileTableModel extends AbstractTableModel {
     fireTableDataChanged();
     return r;
   }
-  
-  public Pair<Integer, Integer> sortFirst(int[] reordering) {
-    int diff = 0, change = 0;
-    for(int i = 0; i < reordering.length; i++) {
-      int index = reordering[i];
-      if (index == 0) {
-        break;
-      }
-      diff = 1;
-      File f = entries.get(change);
-      entries.set(change, entries.get(index));
-      entries.set(index, f);
-      change++;
-    }
-    fireTableDataChanged();
-    return Pair.of(0, change > 0 ? change - diff : reordering[reordering.length - 1]);
-  }
-  
-  public Pair<Integer, Integer>  sortLast(int[] reordering) {
-    int diff = 0, change = entries.size() - 1;
-    for(int i = reordering.length - 1; i >= 0 ; i--) {
-      int index = reordering[i];
-      if (index == entries.size() - 1) {
-        break;
-      }
-      diff = 1;
-      File f = entries.get(change);
-      entries.set(change, entries.get(index));
-      entries.set(index, f);
-      change--;
-    }
-    fireTableDataChanged();
-    return Pair.of(change < entries.size() - 1 ? change + diff : reordering[0], entries.size() - 1);
-  }
-
 }

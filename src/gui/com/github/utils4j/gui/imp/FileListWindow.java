@@ -155,9 +155,9 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
 
   private void onFirst(ActionEvent e) {
     if (selectedRows.length > 0) {
-      Pair<Integer, Integer> p = tableModel.sortFirst(selectedRows);
-      table.setRowSelectionInterval(p.getKey(), p.getValue());
-      scrollToVisible(p.getKey(), 0);
+      do {
+        onUp(e);
+      }while(selectedRows.length > 0 && selectedRows[0] != 0);
     }
   }
 
@@ -179,10 +179,10 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
 
   private void onLast(ActionEvent e) {
     if (selectedRows.length > 0) {
-      Pair<Integer, Integer> p = tableModel.sortLast(selectedRows);
-      table.setRowSelectionInterval(p.getKey(), p.getValue());
-      scrollToVisible(p.getValue(), 0);
-    }
+      do {
+        onDown(e);
+      }while(selectedRows.length > 0 && selectedRows[selectedRows.length - 1] != table.getRowCount() - 1);
+    }    
   }
   
   private void setupFieldName() {
@@ -243,7 +243,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
 
   public static List<File> createListFiles() {
     return Containers
-      .arrayList(new File("D:\\temp").listFiles(new FilenameFilter() {
+      .arrayList(new File("D:\\TEST-SHELL").listFiles(new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
           return name.endsWith(".pdf");
