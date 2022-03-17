@@ -152,7 +152,7 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
           return false;
         }
         int p = "*".equals(page) ? Integer.MAX_VALUE : Strings.toInt(page, -1);
-        if (p < previous) {
+        if (p < previous || p == 0) {
           return false;
         }
         previous = p; 
