@@ -1,7 +1,6 @@
 package com.github.utils4j.imp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class Objects {
   
@@ -20,7 +19,7 @@ public abstract class Objects {
   }
 
   public static String toJson(Object instance) throws JsonProcessingException {
-    return new ObjectMapper().writeValueAsString(instance);
+    return JsonTools.mapper().writeValueAsString(instance);
   }
   
   public static Object[] arrayOf(Object ... objects) {
