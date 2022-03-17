@@ -10,7 +10,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -24,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 
 import com.github.utils4j.imp.Strings;
@@ -51,13 +51,13 @@ public final class ExceptionAlert extends SimpleFrame {
 
   private static final int MIN_WIDTH = 420;
   
-  private static final int MIN_HEIGHT = 135;
+  private static final int MIN_HEIGHT = 163;
   
   private final JTextArea textArea = new JTextArea();
   
   private final JPanel southPane = new JPanel();
   
-  private final JLabel seeDetailsPane = new JLabel("<html><u>Ver detalhes</u></html>");
+  private final JLabel seDetailLabel = new JLabel("<html><u>Ver detalhes</u></html>");
   
   private ExceptionAlert(Image icon, String message, String detail, Throwable cause) {
     super("Mensagem de erro", icon);
@@ -79,9 +79,9 @@ public final class ExceptionAlert extends SimpleFrame {
     addWindowStateListener(new WindowStateListener() {
       public void windowStateChanged(WindowEvent e) {
         if ((e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH){
-          seeDetailsPane.setText("<html><u>Esconder detalhes</u></html>");
+          seDetailLabel.setText("<html><u>Esconder detalhes</u></html>");
         } else if ((e.getNewState() & Frame.NORMAL) == Frame.NORMAL) {
-          seeDetailsPane.setText("<html><u>Ver detalhes</u></html>");
+          seDetailLabel.setText("<html><u>Ver detalhes</u></html>");
         }
       }
    });    
@@ -106,23 +106,28 @@ public final class ExceptionAlert extends SimpleFrame {
 
   private JPanel north(String message) {
     final JPanel northPane = new JPanel();
-    northPane.setLayout(new GridLayout(3, 1, 0, 0));
+    northPane.setLayout(new MigLayout());
     JLabel activityLabel = new JLabel("<html>&nbsp;" + Strings.trim(message) + "</html>");
+    activityLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
     activityLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
     activityLabel.setHorizontalAlignment(SwingConstants.LEFT);
-    northPane.add(activityLabel);
-    seeDetailsPane.setVerticalAlignment(SwingConstants.BOTTOM);
-    seeDetailsPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    seeDetailsPane.setHorizontalAlignment(SwingConstants.CENTER);
-    seeDetailsPane.setVerticalAlignment(SwingConstants.CENTER);
-    seeDetailsPane.setForeground(Color.BLUE);
-    seeDetailsPane.setFont(new Font("Tahoma", Font.ITALIC, 12));
-    seeDetailsPane.addMouseListener(new MouseAdapter(){  
+    northPane.add(activityLabel, "wrap");
+    
+    JPanel detailPanel = new JPanel();
+    detailPanel.setLayout(new MigLayout("center"));
+    seDetailLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+    seDetailLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    seDetailLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    seDetailLabel.setVerticalAlignment(SwingConstants.CENTER);
+    seDetailLabel.setForeground(Color.BLUE);
+    seDetailLabel.setFont(new Font("Tahoma", Font.ITALIC, 12));
+    seDetailLabel.addMouseListener(new MouseAdapter(){  
       public void mouseClicked(MouseEvent e) {
-        setDetail(seeDetailsPane);
+        setDetail(seDetailLabel);
       }
     });
-    northPane.add(seeDetailsPane);
+    detailPanel.add(seDetailLabel);
+    northPane.add(detailPanel, "pushx, growx");
     return northPane;
   }
   

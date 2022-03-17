@@ -63,6 +63,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     setSize(new Dimension(650, 300));
     setFixedMinimumSize(this, new Dimension(MIN_WIDTH, MIN_HEIGHT));
     setLocationRelativeTo(null);
+    setAutoRequestFocus(true);
   }
 
   private void createSouth() {
@@ -153,14 +154,6 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     table.scrollRectToVisible(new Rectangle(table.getCellRect(rowIndex, 0, true)));
   }
 
-  private void onFirst(ActionEvent e) {
-    if (selectedRows.length > 0) {
-      do {
-        onUp(e);
-      }while(selectedRows.length > 0 && selectedRows[0] != 0);
-    }
-  }
-
   private void onUp(ActionEvent e) {
     if (selectedRows.length > 0) {
       Pair<Integer, Integer> p = tableModel.sortUp(selectedRows);
@@ -177,12 +170,16 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     }
   }
 
+  private void onFirst(ActionEvent e) {
+    while(selectedRows.length > 0 && selectedRows[0] != 0){
+      onUp(e);
+    };
+  }
+  
   private void onLast(ActionEvent e) {
-    if (selectedRows.length > 0) {
-      do {
-        onDown(e);
-      }while(selectedRows.length > 0 && selectedRows[selectedRows.length - 1] != table.getRowCount() - 1);
-    }    
+    while(selectedRows.length > 0 && selectedRows[selectedRows.length - 1] != table.getRowCount() - 1) {
+      onDown(e);
+    };
   }
   
   private void setupFieldName() {
@@ -237,13 +234,13 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
 
   @Override
   public Optional<String> getFileName() {
-    setVisible(true);
+    SwingTools.invokeAndWait(() -> setVisible(true));
     return Strings.optional(fileName.getText());
   }
 
   public static List<File> createListFiles() {
     return Containers
-      .arrayList(new File("D:\\TEST-SHELL").listFiles(new FilenameFilter() {
+      .arrayList(new File("C:\\Users\\Leonardo\\Documents\\TEMP").listFiles(new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
           return name.endsWith(".pdf");

@@ -71,7 +71,7 @@ public class Dialogs {
   }
 
   public static String getOption(final String message, final String[] options, final String defaultValue) {
-    return (String) JOptionPane.showInputDialog(null, message, "Choose one", JOptionPane.QUESTION_MESSAGE, null, options, defaultValue);
+    return (String) JOptionPane.showInputDialog(null, message, "Escolha uma", JOptionPane.QUESTION_MESSAGE, null, options, defaultValue);
   }
 
   public static Integer getInteger(final String message, final Integer defaultValue) {
@@ -248,5 +248,9 @@ public class Dialogs {
       }
       return textInput;
     }
+  }
+  
+  public static void main(String[] args) {
+    Dialogs.error("deu pau");
   }
 }
