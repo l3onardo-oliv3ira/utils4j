@@ -51,7 +51,7 @@ public class DownloadStatus implements IDownloadStatus {
   }
 
   @Override
-  public final OutputStream onNewTry(int attemptCount) throws IOException {
+  public final OutputStream onNewTry() throws IOException {
     checkIfOffline();
     file = saveAt.orElseGet(() -> tryCall(() -> createTempFile("downloaded_tmp", ".utils4j.tmp"), new File("*unabled to create temp file*")));
     out = new FileOutputStream(file) {

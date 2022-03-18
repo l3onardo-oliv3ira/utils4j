@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface IDownloadStatus {
   
-  OutputStream onNewTry(int attemptCount) throws IOException;
+  OutputStream onNewTry() throws IOException;
   
   void onStartDownload(long total) throws InterruptedException;
   
