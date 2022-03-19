@@ -15,7 +15,7 @@ public abstract class AbstractPanel extends JPanel {
   private final String baseIcons;
   
   public AbstractPanel() {
-    this("/icons/buttons/");
+    this("/cp4j/icons/buttons/");
   }
   
   public AbstractPanel(String baseIcons) {

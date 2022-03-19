@@ -6,11 +6,11 @@
 
   <groupId>com.github</groupId>
   <artifactId>utils4j</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0</version>
 
   <name>utils4j</name>
   <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <url>http://github.com/l3onardo-oliveira</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -73,11 +73,12 @@
 	    <artifactId>miglayout</artifactId>
 	    <version>3.7.4</version>
 	</dependency>
-	
   </dependencies>
 
+   
   <build>
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+  
+  	<pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
         <plugin>
@@ -92,6 +93,14 @@
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.8.0</version>
+          <configuration>
+				<optimize>true</optimize>
+				<showWarnings>true</showWarnings>
+				<showDeprecation>true</showDeprecation>
+				<compilerArguments>
+					<bootclasspath>${java.home}/lib/rt.jar;${java.home}/lib/jce.jar</bootclasspath>
+				</compilerArguments>
+		  </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -120,5 +129,29 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    
+    <plugins>
+    	<plugin>
+    		<groupId>org.codehaus.mojo</groupId>
+    		<artifactId>build-helper-maven-plugin</artifactId>
+    		<version>3.3.0</version>
+    		<executions>
+		        <execution>
+		            <phase>generate-sources</phase>
+		            <goals>
+		                <goal>add-source</goal>
+		            </goals>
+		            <configuration>
+		                <sources>
+		                    <source>src/gui</source>
+		                    <source>src/function</source>
+		                    <source>src/thread</source>
+		                    <source>src/params</source>
+		                </sources>
+		            </configuration>
+		        </execution>
+		    </executions>
+    	</plugin>
+    </plugins>
   </build>
 </project>
