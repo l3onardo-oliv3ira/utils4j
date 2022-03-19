@@ -52,7 +52,7 @@ public final class ExceptionAlert extends SimpleFrame {
   
   private static final int MIN_WIDTH = 420;
   
-  private static final int MIN_HEIGHT = 163;
+  private static final int MIN_HEIGHT = 160;
   
   private final JTextArea textArea = new JTextArea();
   
