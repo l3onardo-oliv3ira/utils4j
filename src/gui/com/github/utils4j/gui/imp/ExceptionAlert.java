@@ -2,6 +2,7 @@ package com.github.utils4j.gui.imp;
 
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
 import static com.github.utils4j.gui.imp.SwingTools.setFixedMinimumSize;
+import static com.github.utils4j.imp.Strings.empty;
 import static com.github.utils4j.imp.Strings.trim;
 
 import java.awt.BorderLayout;
@@ -33,6 +34,10 @@ import net.miginfocom.swing.MigLayout;
 
 public final class ExceptionAlert extends SimpleFrame {
   
+  public static void show(String message, Throwable cause) {
+    show(message, empty(), cause);
+  }
+  
   public static void show(String message, String detail, Throwable cause) {
     show(null, message, detail, cause);
   }
@@ -45,10 +50,6 @@ public final class ExceptionAlert extends SimpleFrame {
     new ExceptionAlert(icon, message, detail, cause).display();
   }
   
-  public static void main(String... args) {
-    show(null, "leonardo", "url - xpto", new Throwable("mensagem qualquer"));
-  }
-
   private static final int MIN_WIDTH = 420;
   
   private static final int MIN_HEIGHT = 163;
@@ -61,18 +62,20 @@ public final class ExceptionAlert extends SimpleFrame {
   
   private ExceptionAlert(Image icon, String message, String detail, Throwable cause) {
     super("Mensagem de erro", icon);
+    setupLayout(message, detail, cause);
     setupListeners();
-    final JPanel contentPane = new JPanel();
-    
+    setFixedMinimumSize(this, new Dimension(MIN_WIDTH, MIN_HEIGHT));
+    setAutoRequestFocus(true);
+  }
+
+  private void setupLayout(String message, String detail, Throwable cause) {
+    JPanel contentPane = new JPanel();
     contentPane.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
     contentPane.setLayout(new BorderLayout(0, 0));
     contentPane.add(north(message), BorderLayout.NORTH);
     contentPane.add(center(detail, cause), BorderLayout.CENTER);
     contentPane.add(south(), BorderLayout.SOUTH);
-
-    setFixedMinimumSize(this, new Dimension(MIN_WIDTH, MIN_HEIGHT));
     setContentPane(contentPane);
-    setAutoRequestFocus(true);
   }
 
   private void setupListeners() {
