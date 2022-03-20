@@ -4,6 +4,7 @@ import static com.github.utils4j.imp.Throwables.tryRun;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -30,9 +31,14 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   
   private long startTime;
   
+  private final File lockFile;
+  
+  private RandomAccessFile lock = null;
+  
   public FilePacker(Path folderWatching) {
     super("shell-packer");
     this.folderWatching = Args.requireNonNull(folderWatching, "folderWatching is null");
+    this.lockFile = folderWatching.resolve(".lock").toFile();
   }
   
   @Override
@@ -53,9 +59,11 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   protected void afterRun() {
     uninstall();
   }
-
+  
   private void install() throws IOException {
     Directory.requireFolder(folderWatching);
+    lockFile.createNewFile();
+    lock = new RandomAccessFile(lockFile, "r");
     watchService = FileSystems.getDefault().newWatchService();
     folderWatching.register(watchService,  StandardWatchEventKinds.ENTRY_CREATE);
   }
@@ -63,17 +71,26 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   private void uninstall() {
     closeService();
     reset();
+    releaseLock();
     pathPool.clear();
   }
 
   private void cleanFolder() {
-    tryRun(() -> Directory.clean(folderWatching, f -> f.isFile() && !".gitignore".equals(f.getName())));
+    tryRun(() -> Directory.clean(folderWatching, f -> f.isFile() && !f.equals(lockFile)));
   }
 
   private void closeService() {
     if (watchService != null) {
       tryRun(watchService::close);
       watchService = null;
+    }
+  }
+  
+  private void releaseLock() {
+    if (lock != null) {
+      tryRun(lock::close);
+      lockFile.delete();
+      lock = null;
     }
   }
   
@@ -133,6 +150,7 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
         if (pathPool.isEmpty() || !hasTimeout()) {
           continue;
         }
+        
         makeBlocksAvailable(block());
 
       }finally {
