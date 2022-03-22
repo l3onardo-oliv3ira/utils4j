@@ -28,6 +28,10 @@ public class SimpleDialog extends JEscDialog {
     this.setIconImage(icon);
   }
 
+  public void showToFront(){
+    SwingTools.showToFront(this);
+  }  
+  
   public void close() {
     this.setVisible(false);
     this.dispose();

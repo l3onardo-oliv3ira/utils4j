@@ -19,12 +19,11 @@ public class SimpleFrame extends JEscFrame {
     super(title, gc);
     super.setIconImage(icon);
   }
-
-  public void showToFront(){
-    this.setVisible(true); 
-    this.toFront();
-  }
   
+  public void showToFront(){
+    SwingTools.showToFront(this);
+  }  
+
   public void close() {
     this.setVisible(false);
     this.dispose();

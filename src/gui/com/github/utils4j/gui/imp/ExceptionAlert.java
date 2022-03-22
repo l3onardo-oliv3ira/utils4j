@@ -12,6 +12,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -37,7 +38,7 @@ public final class ExceptionAlert extends SimpleFrame {
   public static void show(String message, Throwable cause) {
     show(message, empty(), cause);
   }
-  
+
   public static void show(String message, String detail, Throwable cause) {
     show(null, message, detail, cause);
   }
@@ -64,6 +65,7 @@ public final class ExceptionAlert extends SimpleFrame {
     super("Mensagem de erro", icon);
     setupLayout(message, detail, cause);
     setupListeners();
+    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     setFixedMinimumSize(this, new Dimension(MIN_WIDTH, MIN_HEIGHT));
     setAutoRequestFocus(true);
   }
@@ -88,11 +90,18 @@ public final class ExceptionAlert extends SimpleFrame {
         }
       }
    });    
- }
+  }
+  
+  @Override
+  protected void onEscPressed(ActionEvent e) {
+    super.onEscPressed(e);    
+  }
 
   private JPanel south() {
     JButton okButton = new JButton("OK");
-    okButton.addActionListener((e) -> onEscPressed(e));
+    okButton.addActionListener((e) -> {
+      onEscPressed(e);      
+    });
     southPane.setLayout(new MigLayout("center"));
     southPane.add(okButton);
     return southPane;

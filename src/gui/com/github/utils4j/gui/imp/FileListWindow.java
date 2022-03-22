@@ -22,7 +22,6 @@ import java.util.Optional;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -64,6 +63,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     setFixedMinimumSize(this, new Dimension(MIN_WIDTH, MIN_HEIGHT));
     setLocationRelativeTo(null);
     setAutoRequestFocus(true);
+    setAlwaysOnTop(true);
   }
 
   private void createSouth() {
@@ -132,9 +132,13 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
 
   @Override
   protected void onEscPressed(ActionEvent e) {
-    int option = JOptionPane.showConfirmDialog(null, "Deseja mesmo cancelar a operação?", "Cancelamento da operação",
-        JOptionPane.YES_NO_OPTION);
-    if (option == JOptionPane.YES_OPTION) {
+    setAlwaysOnTop(false);
+    boolean cancell = Dialogs.getBoolean(
+      "Deseja mesmo cancelar a operação?",
+      "Cancelamento da operação", 
+      false
+    );
+    if (cancell) {
       this.fileName.setText(empty());
       this.close();
     }
@@ -234,7 +238,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
 
   @Override
   public Optional<String> getFileName() {
-    SwingTools.invokeAndWait(() -> setVisible(true));
+    this.showToFront();
     return Strings.optional(fileName.getText());
   }
 

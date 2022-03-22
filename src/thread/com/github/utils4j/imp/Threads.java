@@ -36,13 +36,24 @@ public class Threads {
   }
 
   public static Thread startAsync(Runnable runnable) {
-    return startAsync("From:" + Thread.currentThread().getName(), runnable);
+    return startAsync(runnable, 0);
   }
   
-  public static Thread startAsync(String threadName, Runnable runnable) {
+  public static Thread startAsync(Runnable runnable, long delay) {
+    return startAsync("From:" + Thread.currentThread().getName(), runnable, delay);
+  }
+  
+  public static Thread startAsync(String threadName, Runnable runnable) { 
+    return startAsync(threadName, runnable, 0);
+  }
+
+  public static Thread startAsync(String threadName, Runnable runnable, long delay) {
     Args.requireText(threadName, "threadName is empty");
     Args.requireNonNull(runnable, "runnable is null");
-    Thread t = new Thread(runnable, threadName);
+    Thread t = new Thread(() -> {
+      Threads.sleep(delay);
+      runnable.run();
+    }, threadName);
     t.start();
     return t;
   }

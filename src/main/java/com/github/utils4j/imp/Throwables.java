@@ -182,6 +182,7 @@ public final class Throwables {
     Set<Throwable> dejaVu = newSetFromMap(new IdentityHashMap<Throwable, Boolean>()); 
     do {
       dejaVu.add(rootCause = throwable);
+      visitor.accept(rootCause);
       throwable = throwable.getCause();
     }while(throwable != null && !dejaVu.contains(throwable));
     return rootCause;

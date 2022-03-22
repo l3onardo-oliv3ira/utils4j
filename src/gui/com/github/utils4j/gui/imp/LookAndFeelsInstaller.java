@@ -16,13 +16,13 @@ import com.github.utils4j.imp.Args;
 
 public final class LookAndFeelsInstaller {
 
-  /*
-   Metal
+/*
+Metal
 CDE/Motif
 Nimbus
 Windows
 Windows Classic
-   * */
+*/
   private LookAndFeelsInstaller() {}
 
   public static void install(String looksAndFeelsName) { 

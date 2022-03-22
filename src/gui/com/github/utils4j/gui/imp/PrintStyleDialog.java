@@ -13,7 +13,6 @@ import java.util.Optional;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
@@ -81,6 +80,7 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
     setSize(300, 140);
     setLocationRelativeTo(null);
     setAutoRequestFocus(true);
+    setAlwaysOnTop(true);
   }
 
   private JPanel center() {
@@ -163,12 +163,13 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
   
   @Override
   protected void onEscPressed(ActionEvent e) {
-    int option = JOptionPane.showConfirmDialog(null, 
-      "Deseja mesmo cancelar a operação?", 
+    setAlwaysOnTop(false);    
+    boolean cancell = Dialogs.getBoolean(
+      "Deseja mesmo cancelar a operação?",
       "Cancelamento da operação", 
-      JOptionPane.YES_NO_OPTION
+      false
     );
-    if (option == JOptionPane.YES_OPTION) {
+    if (cancell) {
       this.pages.setText(empty());
       this.close();
     }

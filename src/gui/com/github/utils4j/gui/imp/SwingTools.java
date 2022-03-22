@@ -1,5 +1,6 @@
 package com.github.utils4j.gui.imp;
 
+import static com.github.utils4j.imp.Threads.startAsync;
 import static com.github.utils4j.imp.Throwables.tryCall;
 import static com.github.utils4j.imp.Throwables.tryRuntime;
 import static java.util.Optional.empty;
@@ -60,7 +61,7 @@ public class SwingTools {
   }
   
   public static void setFixedMinimumSize(Window window, Dimension dimension) {
-    Args.requireNonNull(window, "panel is null");
+    Args.requireNonNull(window, "window is null");
     Args.requireNonNull(dimension, "dimension is null");
     window.setMinimumSize(dimension);
     window.addComponentListener(new ComponentAdapter() {
@@ -73,5 +74,14 @@ public class SwingTools {
         window.setSize(windowDimension);
       }
     });    
+  }
+
+  public static void showToFront(Window window) {
+    Args.requireNonNull(window, "window is null");
+    boolean top = window.isAlwaysOnTop();
+    window.setAlwaysOnTop(true);
+    window.setVisible(true); 
+    window.toFront();    
+    startAsync(() -> invokeLater(() -> window.setAlwaysOnTop(top)), 500); //force to on top   
   }
 }
