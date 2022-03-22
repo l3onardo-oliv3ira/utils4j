@@ -1,12 +1,15 @@
 package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Strings.text;
+import static java.util.Collections.newSetFromMap;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -18,8 +21,11 @@ import org.slf4j.LoggerFactory;
 import com.github.utils4j.imp.function.Executable;
 import com.github.utils4j.imp.function.Procedure;
 
-public class Throwables {
+public final class Throwables {
+  
   private static final Logger LOGGER = LoggerFactory.getLogger(Throwables.class);
+  
+  private static final String UNKNOWN_CAUSE = "Causa desconhecida";
   
   private Throwables() {}
   
@@ -92,57 +98,6 @@ public class Throwables {
     }
   }
   
-  public static Throwable rootCause(Throwable throwable) {
-    while(throwable != null){
-      Throwable rootCause = throwable.getCause();
-      if (rootCause == null || rootCause == throwable)
-        break;
-      throwable = rootCause;
-    }
-    return throwable;
-  }
-  
-  public static String rootMessage(Throwable throwable) {
-    Throwable rootCause = rootCause(throwable);
-    if (rootCause == null)
-      return "Causa desconhecida";
-    String message = rootCause.getClass().getName();
-    return message + ": " + text(rootCause.getMessage(), "Causa desconhecida");
-  }
-  
-  public static String traceRoot(Throwable throwable) {
-    Throwable rootCause = rootCause(throwable);
-    if (rootCause == null)
-      return "Causa desconhecida";
-    StringWriter w = new StringWriter();
-    try(PrintWriter p = new PrintWriter(w)){
-      rootCause.printStackTrace(p);
-      return w.toString();
-    }
-  }
-  
-  public static Stream<Throwable> streamTrace(Throwable throwable) {
-    List<Throwable> list = new ArrayList<>();
-    while(throwable != null){
-      list.add(throwable);
-      Throwable rootCause = throwable.getCause();
-      if (rootCause == null || rootCause == throwable)
-        break;
-      throwable = rootCause;
-    }
-    return list.stream();    
-  }
-
-  public static String stackTrace(Throwable throwable) {
-    if (throwable == null)
-      return "Causa desconhecida";
-    StringWriter w = new StringWriter();
-    try(PrintWriter p = new PrintWriter(w)){
-      throwable.printStackTrace(p);
-      return w.toString();
-    }
-  }
-
   public static void tryRuntime(Executable<?> e) {
     try {
       e.execute();
@@ -214,15 +169,73 @@ public class Throwables {
       finallyBlock.run();
     }
   }
+  
+  public static Throwable rootCause(Throwable throwable) {
+    return rootCause(throwable, (t) -> {});
+  }
 
-  public static boolean hasCause(Throwable e, Class<?> clazz) {
-    if (e == null)
+  private static Throwable rootCause(Throwable throwable, Consumer<Throwable> visitor) {
+    if (throwable == null)
+      return null;
+    Throwable rootCause;
+    //preventy circular causes
+    Set<Throwable> dejaVu = newSetFromMap(new IdentityHashMap<Throwable, Boolean>()); 
+    do {
+      dejaVu.add(rootCause = throwable);
+      throwable = throwable.getCause();
+    }while(throwable != null && !dejaVu.contains(throwable));
+    return rootCause;
+  }
+  
+  public static Stream<Throwable> traceStream(Throwable throwable) {
+    List<Throwable> list = new ArrayList<>();
+    rootCause(throwable, list::add);
+    return list.stream();
+  }
+  
+  public static String rootMessage(Throwable throwable) {
+    Throwable rootCause = rootCause(throwable);
+    if (rootCause == null)
+      return UNKNOWN_CAUSE;
+    String message = rootCause.getClass().getName();
+    return message + ": " + text(rootCause.getMessage(), UNKNOWN_CAUSE);
+  }
+  
+  public static String rootTrace(Throwable throwable) {
+    Throwable rootCause = rootCause(throwable);
+    if (rootCause == null)
+      return UNKNOWN_CAUSE;
+    StringWriter w = new StringWriter();
+    try(PrintWriter p = new PrintWriter(w)){
+      rootCause.printStackTrace(p);
+      return w.toString();
+    }
+  }
+
+  public static String stackTrace(Throwable throwable) {
+    if (throwable == null)
+      return UNKNOWN_CAUSE;
+    StringWriter w = new StringWriter();
+    try(PrintWriter p = new PrintWriter(w)){
+      throwable.printStackTrace(p);
+      return w.toString();
+    }
+  }
+
+  public static boolean hasCause(Throwable throwable, Class<?> clazz) {
+    if (throwable == null || clazz == null)
       return false;
-    if (clazz.isInstance(e))
-      return true;
-    Throwable cause;
-    if (e == (cause = e.getCause())) //block recursive call infinitly
-      return false;
-    return hasCause(cause, clazz);
+    Set<Throwable> dejaVu = null;
+    do {
+      if (clazz.isInstance(throwable))
+        return true;
+      if (dejaVu == null) {
+        //preventy circular causes
+        dejaVu = newSetFromMap(new IdentityHashMap<Throwable, Boolean>());
+      }
+      dejaVu.add(throwable);
+      throwable = throwable.getCause();
+    } while(throwable != null && !dejaVu.contains(throwable));
+    return false;
   }
 }
