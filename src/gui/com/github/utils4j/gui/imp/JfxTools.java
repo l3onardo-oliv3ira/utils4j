@@ -10,6 +10,10 @@ public final class JfxTools {
   
   private JfxTools() {}
   
+  public static void runLatter(Runnable runnable) {
+    Platform.runLater(runnable);
+  }
+  
   public static void runAndWait(Runnable runnable) {
     tryRuntime(() -> {
       if (Platform.isFxApplicationThread()) {
