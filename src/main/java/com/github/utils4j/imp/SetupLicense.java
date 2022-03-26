@@ -24,41 +24,50 @@
 * SOFTWARE.
 */
 
-
 package com.github.utils4j.imp;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.function.Predicate;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class Directory {
-  private Directory() {}
+import com.github.utils4j.IConstants;
+
+public class SetupLicense {
+
+  private SetupLicense() {}
   
-  public static void clean(Path path) throws IOException {
-    clean(path, (f) -> true);
-  }
-  
-  public static void clean(Path path, Predicate<File> predicate) throws IOException {
-    try (Stream<Path> walk = Files.walk(path)) {        
-      walk.sorted(Comparator.reverseOrder())
-        .map(Path::toFile)
-        .filter(predicate)
-        .forEach(File::delete);
-    }
-  }
-  
-  public static void requireFolder(Path path) throws IOException {
-    Args.requireNonNull(path, "path is null");
-    File f = path.toFile();
-    if (f.exists() && f.isDirectory())
-      return;
-    f.delete();
-    if (!f.mkdirs()) {
-      throw new IOException("Unabled to create folder " + f.getAbsolutePath());
+  public static void main(String[] args) throws IOException {
+    Path root = Paths.get("../");
+    List<String> licenseLines = Files.readAllLines(Paths.get("./LICENSE"));
+    try (Stream<Path> walk = Files.walk(root)) {        
+      walk.map(Path::toFile)
+        .filter(f -> f.getName().endsWith(".java"))
+        .forEach(java -> {
+          List<String> javaLines;
+          try {
+            javaLines = Files.readAllLines(java.toPath(), IConstants.UTF_8);
+          } catch (IOException e1) {
+            return;
+          }
+          if (javaLines.stream().anyMatch(l -> l.contains("MIT License")))
+            return;
+          File original = java;
+          java.renameTo(java = new File(java.getParent(), java.getName() + ".bkp"));
+          try(PrintWriter w = new PrintWriter(original, "UTF-8")) {
+            w.println("/*");
+            licenseLines.forEach(l -> w.println("* " + l));
+            w.println("*/\n");
+            javaLines.forEach(w::println);
+            java.delete();
+          } catch (Exception e) {
+            java.renameTo(original);
+          }
+        });
     }
   }
 }
