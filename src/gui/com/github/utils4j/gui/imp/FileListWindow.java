@@ -172,8 +172,9 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   }
 
   private void onSave(ActionEvent e) {
-    Optional<String> fileName = optional(trim(this.fileName.getText()).replaceAll("[\\\\/:*?\"<>|]", empty()));
+    Optional<String> fileName = optional(trim(this.fileName.getText()).replaceAll("[\\\\/:*?\"<>|%]", empty()));
     if (fileName.isPresent()) {
+      this.fileName.setText(fileName.get());
       close();
     } else {
       this.fileName.setText("");
