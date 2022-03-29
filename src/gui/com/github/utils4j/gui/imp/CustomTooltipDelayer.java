@@ -30,7 +30,8 @@ package com.github.utils4j.gui.imp;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.ToolTipManager;
 
 public final class CustomTooltipDelayer extends MouseAdapter {
   

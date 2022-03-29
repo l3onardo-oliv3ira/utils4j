@@ -26,13 +26,13 @@
 
 
 package com.github.utils4j.gui.imp;
-
 import static com.github.utils4j.imp.Threads.startAsync;
 import static com.github.utils4j.imp.Throwables.tryCall;
 import static com.github.utils4j.imp.Throwables.tryRuntime;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.SwingUtilities;
 
 import com.github.utils4j.imp.Args;
+import com.github.utils4j.imp.Stack;
 import com.github.utils4j.imp.function.Procedure;
 import com.github.utils4j.imp.function.Supplier;
 
@@ -103,12 +104,38 @@ public class SwingTools {
     });    
   }
 
+  private static Stack<Window> stackOnTop = new Stack<>();
+  
   public static void showToFront(Window window) {
     Args.requireNonNull(window, "window is null");
+
+    if (window instanceof Dialog) {
+      Dialog d = (Dialog)window;
+      if (d.isModal()) {
+        if (!stackOnTop.isEmpty())
+          stackOnTop.peek().setAlwaysOnTop(false);        
+        window.setAlwaysOnTop(true);
+        stackOnTop.push(window);
+        toFront(window, null);
+        d.setVisible(true);
+        stackOnTop.pop();
+        if (!stackOnTop.isEmpty())
+          stackOnTop.peek().setAlwaysOnTop(true);
+        return;
+      }
+    }
     boolean top = window.isAlwaysOnTop();
     window.setAlwaysOnTop(true);
-    window.setVisible(true); 
-    window.toFront();    
-    startAsync(() -> invokeLater(() -> window.setAlwaysOnTop(top)), 500); //force to on top   
+    window.setVisible(true);    
+    toFront(window, top);
+  }
+
+  private static void toFront(Window window, Boolean top) {
+    startAsync(() -> invokeLater(() -> {
+      window.toFront();
+      if (top != null) {
+        window.setAlwaysOnTop(top);
+      }
+    }), 600); //force to on top after some milliseconds   
   }
 }

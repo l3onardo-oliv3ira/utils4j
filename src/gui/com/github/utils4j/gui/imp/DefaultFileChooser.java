@@ -68,7 +68,7 @@ public class DefaultFileChooser extends JFileChooser {
   @Override
   protected JDialog createDialog(final Component parent) throws HeadlessException {
     final JDialog dialog = super.createDialog(parent);
-    dialog.setLocationByPlatform(true);
+    dialog.setLocation(100, 100);
     dialog.setAlwaysOnTop(true);
     return dialog;
   }
