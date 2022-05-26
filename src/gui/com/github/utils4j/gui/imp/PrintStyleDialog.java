@@ -47,6 +47,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.github.utils4j.gui.IPrintStyleDialog;
+import com.github.utils4j.imp.Booleans;
 import com.github.utils4j.imp.Strings;
 
 import net.miginfocom.swing.MigLayout;
@@ -191,12 +192,12 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
   @Override
   protected void onEscPressed(ActionEvent e) {
     setAlwaysOnTop(false);    
-    boolean cancell = Dialogs.getBoolean(
+    Boolean cancell = Dialogs.getBoolean(
       "Deseja mesmo cancelar a operação?",
       "Cancelamento da operação", 
       false
     );
-    if (cancell) {
+    if (Booleans.isTrue(cancell, false)) {
       this.pages.setText(empty());
       this.close();
     }

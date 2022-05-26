@@ -97,7 +97,7 @@ public class Dialogs {
         if (!openFile) {
           final String shortFileName = chooser.getSelectedFile().getName();
           final Boolean replaceFile = getBoolean(shortFileName + " já existe. Gosaria de substituí-lo?", "Escolha um arquivo", false);
-          if (replaceFile) {
+          if (replaceFile != null && replaceFile) {
             break;
           }
         } else {

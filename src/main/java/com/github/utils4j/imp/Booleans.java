@@ -25,15 +25,22 @@
 */
 
 
-package com.github.utils4j;
+package com.github.utils4j.imp;
 
-import java.io.File;
-import java.util.List;
+public final class Booleans {
 
-public interface IFilePacker<T extends Exception> extends ILifeCycle<T>, IOfferer {
+  private Booleans() {
+  }
 
-  void reset();
-
-  List<File> filePackage() throws InterruptedException;
+  public static boolean isTrue(Boolean value) {
+    return value != null && value.booleanValue();
+  }
   
+  public static boolean isTrue(Boolean value, boolean nullIsTrue) {
+    return nullIsTrue ? (value == null || value.booleanValue()) : (value != null && value.booleanValue());
+  }
+  
+  public static boolean isFalse(Boolean value) {
+    return value != null && !value.booleanValue();  
+  }
 }

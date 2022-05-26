@@ -198,4 +198,9 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   protected void onAvailable(List<File> block) {
     
   }
+
+  @Override
+  public void offer(List<File> files) throws InterruptedException {
+    makeBlocksAvailable(files);
+  }
 }
