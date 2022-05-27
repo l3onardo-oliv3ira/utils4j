@@ -87,4 +87,10 @@ public class Containers {
   public static <T> List<T> arrayList(T... array) {
     return new ArrayList<T>(Arrays.asList(array));
   }
+  
+  public static String[] arrayOf(List<String> container) {
+    if (container == null)
+      return null;
+    return container.toArray(new String[container.size()]);
+  }
 }
