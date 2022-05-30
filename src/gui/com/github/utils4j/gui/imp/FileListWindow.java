@@ -271,9 +271,9 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     return Strings.optional(fileName.getText());
   }
 
-  public static List<File> createListFiles() {
+  private static List<File> createListFiles() {
     return Containers
-      .arrayList(new File("E:\\jfms\\test-shell\\pdfs").listFiles(new FilenameFilter() {
+      .arrayList(new File("E:\\jfms\\test-shell\\pdfs\\GRANDES\\huge_(VOLUMES DE 1 PÁGINA)").listFiles(new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
           return name.endsWith(".pdf");
