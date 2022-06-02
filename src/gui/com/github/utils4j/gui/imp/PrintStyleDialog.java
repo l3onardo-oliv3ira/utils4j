@@ -105,7 +105,7 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
     add(south(), BorderLayout.SOUTH);
     setupPages();
     setResizable(false);
-    setSize(300, 140);
+    setSize(300, 150);
     setLocationRelativeTo(null);
     setAutoRequestFocus(true);
     setAlwaysOnTop(true);
