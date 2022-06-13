@@ -46,6 +46,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.github.utils4j.IAcumulator;
 import com.github.utils4j.IConstants;
 
 public class Streams {
@@ -102,22 +103,25 @@ public class Streams {
   }
 
   public static CompletableFuture<String> readOutStream(InputStream is, Charset charset) {
+    return readOutStream(is, charset, new LineAppender());
+  }
+
+  public static CompletableFuture<String> readOutStream(InputStream is, Charset charset, IAcumulator<String> acumulator) {
     return CompletableFuture.supplyAsync(() -> {
       Thread thread = Thread.currentThread();
       try {
         BufferedReader br = new BufferedReader(new InputStreamReader(is, charset));
-        StringBuilder res = new StringBuilder();
         String inputLine;
         while (!thread.isInterrupted() && (inputLine = br.readLine()) != null) {
-          res.append(inputLine).append(System.lineSeparator());
+          acumulator.accept(inputLine);
         }
-        return res.toString();
+        return acumulator.get();
       } catch (IOException e) {
-        throw new RuntimeException("problem with executing program", e);
+        return acumulator.handleFail(e);
       }
     });
   }
-
+  
   public static String checkMd5Sum(File file) throws IOException {
     try(InputStream fis =  new FileInputStream(file)){
       return DigestUtils.md5Hex(fis);
