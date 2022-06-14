@@ -37,6 +37,12 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Dialogs {
+  
+  public static enum Choice {
+    YES,
+    NO,
+    CANCEL
+  }
 
   static {
     UIManager.put("OptionPane.cancelButtonText", "Cancelar");
@@ -66,19 +72,19 @@ public class Dialogs {
     JOptionPane.showMessageDialog(ON_TOP_FRAME, message, "Erro", JOptionPane.ERROR_MESSAGE);
   }
 
-  public static Boolean yesNo(final String message, final String title, final boolean cancelOption) {
+  public static Choice yesNo(final String message, final String title, final boolean cancelOption) {
     final int options = cancelOption ? JOptionPane.YES_NO_CANCEL_OPTION : JOptionPane.YES_NO_OPTION;
     final int answer = JOptionPane.showConfirmDialog(ON_TOP_FRAME, message, title, options);
 
     switch (answer) {
     case JOptionPane.YES_OPTION:
-      return true;
+      return Choice.YES;
     case JOptionPane.NO_OPTION:
-      return false;
+      return Choice.NO;
     case JOptionPane.CANCEL_OPTION:
-      return null;
+      return Choice.CANCEL;
     }
-    return null;
+    return Choice.CANCEL;
   }
 
   public static String fileDialog(final String extensionDescription, final String extension, final boolean openFile) {
@@ -96,8 +102,8 @@ public class Dialogs {
       if (f.exists()) {
         if (!openFile) {
           final String shortFileName = chooser.getSelectedFile().getName();
-          final Boolean replaceFile = getBoolean(shortFileName + " já existe. Gosaria de substituí-lo?", "Escolha um arquivo", false);
-          if (replaceFile != null && replaceFile) {
+          final Choice replaceFile = getBoolean(shortFileName + " já existe. Gosaria de substituí-lo?", "Escolha um arquivo", false);
+          if (replaceFile == Choice.YES) {
             break;
           }
         } else {
@@ -205,11 +211,11 @@ public class Dialogs {
     }
   }
 
-  public static Boolean getBoolean(final String message, String title) {
+  public static Choice getBoolean(final String message, String title) {
     return getBoolean(message, title, true);
   }
 
-  public static Boolean getBoolean(final String message, String title, final boolean cancelOption) {
+  public static Choice getBoolean(final String message, String title, final boolean cancelOption) {
     return yesNo(message, title, cancelOption);
   }
 

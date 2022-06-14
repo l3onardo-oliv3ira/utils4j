@@ -60,7 +60,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import com.github.utils4j.imp.Args;
-import com.github.utils4j.imp.Booleans;
 import com.github.utils4j.imp.Containers;
 import com.github.utils4j.imp.Dates;
 import com.github.utils4j.imp.Pair;
@@ -161,12 +160,12 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   @Override
   protected void onEscPressed(ActionEvent e) {
     setAlwaysOnTop(false);
-    Boolean cancell = Dialogs.getBoolean(
+    Dialogs.Choice choice = Dialogs.getBoolean(
       "Deseja mesmo cancelar a operação?",
       "Cancelamento da operação", 
       false
     );
-    if (Booleans.isTrue(cancell, false)) {
+    if (choice == Dialogs.Choice.YES) {
       this.fileName.setText(empty());
       this.close();
     }
