@@ -27,8 +27,11 @@
 
 package com.github.utils4j.gui.imp;
 
+import static javax.swing.JOptionPane.showInputDialog;
+
 import java.awt.Window.Type;
 import java.io.File;
+import java.util.Optional;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -120,8 +123,20 @@ public class Dialogs {
     return fileName;
   }
 
-  public static String getOption(final String message, final String[] options, final String defaultValue) {
-    return (String) JOptionPane.showInputDialog(ON_TOP_FRAME, message, "Escolha uma", JOptionPane.QUESTION_MESSAGE, null, options, defaultValue);
+  public static <T> Optional<T> getOption(String message, final T[] options) {
+    return getOption(message, options, null);
+  }
+  
+  public static <T> Optional<T> getOption(String message, final T[] options, final T defaultOption) {
+    return (Optional<T>)Optional.ofNullable(showInputDialog(
+      ON_TOP_FRAME, 
+      message, 
+      "Opções", 
+      JOptionPane.QUESTION_MESSAGE, 
+      null, 
+      options, 
+      defaultOption)
+    );
   }
 
   public static Integer getInteger(final String message, final Integer defaultValue) {
@@ -301,6 +316,5 @@ public class Dialogs {
   }
   
   public static void main(String[] args) {
-    Dialogs.error("deu pau");
   }
 }
