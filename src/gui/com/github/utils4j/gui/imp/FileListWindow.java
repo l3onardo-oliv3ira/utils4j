@@ -40,6 +40,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Date;
@@ -48,6 +50,7 @@ import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -91,6 +94,12 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     setLocationRelativeTo(null);
     setAutoRequestFocus(true);
     setAlwaysOnTop(true);
+    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent windowEvent) {        
+        onEscPressed(null);
+      }
+    });
   }
 
   private void createSouth() {
