@@ -41,6 +41,7 @@ import java.nio.file.WatchService;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
 
 import com.github.utils4j.IFilePacker;
 
@@ -92,7 +93,8 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
     lockFile.createNewFile();
     lock = new RandomAccessFile(lockFile, "r");
     watchService = FileSystems.getDefault().newWatchService();
-    folderWatching.register(watchService,  StandardWatchEventKinds.ENTRY_CREATE);
+    //folderWatching.register(watchService,  StandardWatchEventKinds.ENTRY_CREATE);
+    folderWatching.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_CREATE}, HIGH);
   }
   
   private void uninstall() {

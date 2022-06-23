@@ -75,7 +75,9 @@ public enum ProviderInstaller implements IProviderInstaller {
     Provider provider = Security.getProvider(providerName);
     if (provider != null)
       return provider;
-    Security.addProvider(provider = supplier.get());
+    int code = Security.addProvider(provider = supplier.get());
+    if (code < 0)
+      throw new RuntimeException("Unabled to install provider " + providerName);
     return provider;
   }
   

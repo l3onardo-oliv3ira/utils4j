@@ -84,6 +84,8 @@ public final class ExceptionAlert extends SimpleFrame {
   
   private final JTextArea textArea = new JTextArea();
   
+  private final JScrollPane centerPane = new JScrollPane();
+  
   private final JPanel southPane = new JPanel();
   
   private final JLabel seDetailLabel = new JLabel("<html><u>Ver detalhes</u></html>");
@@ -131,14 +133,15 @@ public final class ExceptionAlert extends SimpleFrame {
     });
     southPane.setLayout(new MigLayout("center"));
     southPane.add(okButton);
+    southPane.setVisible(false);
     return southPane;
   }
 
   private JScrollPane center(String detail, Throwable cause) {
     textArea.setRows(8);
     textArea.setEditable(false);
-    JScrollPane centerPane = new JScrollPane();
     centerPane.setViewportView(textArea);
+    centerPane.setVisible(false);
     textArea.setText(trim(detail) + "\n" + Throwables.stackTrace(cause));
     return centerPane;
   }
@@ -177,6 +180,8 @@ public final class ExceptionAlert extends SimpleFrame {
     }else {
       setExtendedState(JFrame.NORMAL);
     }
+    centerPane.setVisible(show);
+    southPane.setVisible(show);
   }
 
   private void display() {
