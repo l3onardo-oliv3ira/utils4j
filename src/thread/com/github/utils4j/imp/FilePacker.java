@@ -28,6 +28,7 @@
 package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Throwables.tryRun;
+import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,6 @@ import java.nio.file.WatchService;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
 
 import com.github.utils4j.IFilePacker;
 
