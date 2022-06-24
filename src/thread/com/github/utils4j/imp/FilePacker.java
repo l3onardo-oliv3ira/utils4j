@@ -93,7 +93,6 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
     lockFile.createNewFile();
     lock = new RandomAccessFile(lockFile, "r");
     watchService = FileSystems.getDefault().newWatchService();
-    //folderWatching.register(watchService,  StandardWatchEventKinds.ENTRY_CREATE);
     folderWatching.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_CREATE}, HIGH);
   }
   
