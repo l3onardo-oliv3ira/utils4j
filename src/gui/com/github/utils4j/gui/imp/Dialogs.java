@@ -71,6 +71,10 @@ public class Dialogs {
     JOptionPane.showMessageDialog(ON_TOP_FRAME, message, "Informação", JOptionPane.INFORMATION_MESSAGE);
   }
 
+  public static void message(final String message) {
+    JOptionPane.showMessageDialog(null, message, "Informação", JOptionPane.INFORMATION_MESSAGE);    
+  }
+  
   public static void error(final String message) {
     JOptionPane.showMessageDialog(ON_TOP_FRAME, message, "Erro", JOptionPane.ERROR_MESSAGE);
   }
