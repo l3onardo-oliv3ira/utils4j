@@ -34,6 +34,7 @@ import static java.util.Optional.ofNullable;
 
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -43,6 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.SwingUtilities;
 
 import com.github.utils4j.imp.Args;
+import com.github.utils4j.imp.Jvms;
 import com.github.utils4j.imp.Stack;
 import com.github.utils4j.imp.function.Procedure;
 import com.github.utils4j.imp.function.Supplier;
@@ -136,7 +138,8 @@ public class SwingTools {
 
   private static void toFront(Window window, Boolean top) {
     startAsync(() -> invokeLater(() -> {
-      window.toFront();
+      if (Jvms.isWindows())
+        window.toFront();
       if (top != null) {
         window.setAlwaysOnTop(top);
       }
