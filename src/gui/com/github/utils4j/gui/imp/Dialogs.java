@@ -131,6 +131,7 @@ public class Dialogs {
     return getOption(message, options, null);
   }
   
+  @SuppressWarnings("unchecked")
   public static <T> Optional<T> getOption(String message, final T[] options, final T defaultOption) {
     return (Optional<T>)Optional.ofNullable(showInputDialog(
       ON_TOP_FRAME, 
