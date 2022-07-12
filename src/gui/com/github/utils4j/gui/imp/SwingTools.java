@@ -34,7 +34,6 @@ import static java.util.Optional.ofNullable;
 
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
