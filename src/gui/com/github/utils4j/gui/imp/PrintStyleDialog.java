@@ -127,6 +127,7 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
     okButton.addActionListener((e) -> onOk(e));
     JButton cancelButton = new JButton("Cancelar");
     cancelButton.addActionListener((e) -> onEscPressed(e));
+    okButton.setPreferredSize(cancelButton.getPreferredSize());
     JPanel southPane = new JPanel();
     southPane.setLayout(new MigLayout("fillx", "push[][]", "[][]"));
     southPane.add(okButton);
