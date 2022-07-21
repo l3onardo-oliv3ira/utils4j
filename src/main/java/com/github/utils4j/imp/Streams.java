@@ -134,7 +134,7 @@ public class Streams {
     }
   }
   
-  public static String sha1(byte[] input) throws IOException {
+  public static String sha1(byte[] input) {
     return DigestUtils.sha1Hex(input);
   }
   

@@ -36,6 +36,7 @@ import java.util.Optional;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -54,45 +55,55 @@ public class Dialogs {
     UIManager.put("OptionPane.yesButtonText", "Sim"); 
   }
   
-  private static JFrame ON_TOP_FRAME;
-  
-  static {
-    open();
-  }
-  
-  public static void open() {
-    ON_TOP_FRAME = new JFrame("");
-    ON_TOP_FRAME.setType(Type.UTILITY);
-    ON_TOP_FRAME.setAlwaysOnTop(true);
+  private static JFrame createFrame() {
+    JFrame frame = new JFrame("");
+    frame.setType(Type.UTILITY);
+    frame.setAlwaysOnTop(true);
+    return frame;
   };
-  
-  public static void reset() {
-    ON_TOP_FRAME.dispose();
-    open();
-  } 
   
   private Dialogs() {}
 
   public static String input(final String message, final Object defaultValue) {
-    return JOptionPane.showInputDialog(ON_TOP_FRAME, message, defaultValue);
+    JFrame frame = createFrame();
+    try {
+      return JOptionPane.showInputDialog(frame, message, defaultValue);
+    } finally {
+      frame.dispose();
+    }
   }
 
+  public static void warning(final String message) {
+    JFrame frame = createFrame();
+    try {
+      JOptionPane.showMessageDialog(frame, message, "Informação", JOptionPane.WARNING_MESSAGE);
+    } finally {
+      frame.dispose();
+    }
+  }
+  
   public static void info(final String message) {
-    JOptionPane.showMessageDialog(ON_TOP_FRAME, message, "Informação", JOptionPane.INFORMATION_MESSAGE);
-  }
-
-  public static void message(final String message) {
-    JOptionPane.showMessageDialog(null, message, "Informação", JOptionPane.INFORMATION_MESSAGE);    
+    JOptionPane.showMessageDialog(null, message, "Informação", JOptionPane.INFORMATION_MESSAGE); 
   }
   
   public static void error(final String message) {
-    JOptionPane.showMessageDialog(ON_TOP_FRAME, message, "Erro", JOptionPane.ERROR_MESSAGE);
+    JFrame frame = createFrame();
+    try {
+      JOptionPane.showMessageDialog(frame, message, "Erro", JOptionPane.ERROR_MESSAGE);
+    } finally {
+      frame.dispose();
+    }
   }
 
   public static Choice yesNo(final String message, final String title, final boolean cancelOption) {
     final int options = cancelOption ? JOptionPane.YES_NO_CANCEL_OPTION : JOptionPane.YES_NO_OPTION;
-    final int answer = JOptionPane.showConfirmDialog(ON_TOP_FRAME, message, title, options);
-
+    int answer;
+    JFrame frame = createFrame();
+    try {
+      answer = JOptionPane.showConfirmDialog(frame, message, title, options);
+    } finally {
+      frame.dispose();
+    }
     switch (answer) {
     case JOptionPane.YES_OPTION:
       return Choice.YES;
@@ -143,15 +154,20 @@ public class Dialogs {
   
   @SuppressWarnings("unchecked")
   public static <T> Optional<T> getOption(String message, final T[] options, final T defaultOption) {
-    return (Optional<T>)Optional.ofNullable(showInputDialog(
-      ON_TOP_FRAME, 
-      message, 
-      "Opções", 
-      JOptionPane.QUESTION_MESSAGE, 
-      null, 
-      options, 
-      defaultOption)
-    );
+    JFrame frame = createFrame();
+    try {
+      return (Optional<T>)Optional.ofNullable(showInputDialog(
+          frame, 
+          message, 
+          "Opções", 
+          JOptionPane.QUESTION_MESSAGE, 
+          null, 
+          options, 
+          defaultOption)
+        );
+    } finally {
+      frame.dispose();
+    }
   }
 
   public static Integer getInteger(final String message, final Integer defaultValue) {
@@ -328,8 +344,12 @@ public class Dialogs {
       }
       return textInput;
     }
-  }
+  }  
   
   public static void main(String[] args) {
+    SwingUtilities.invokeLater(() -> {
+      Choice c = yesNo("LEONARDO OLIVEIRA", "titulo", true); 
+      System.out.println(c.toString());
+    });
   }
 }
