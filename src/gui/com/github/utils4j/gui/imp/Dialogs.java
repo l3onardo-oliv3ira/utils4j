@@ -54,12 +54,22 @@ public class Dialogs {
     UIManager.put("OptionPane.yesButtonText", "Sim"); 
   }
   
-  private static final JFrame ON_TOP_FRAME = new JFrame("");
+  private static JFrame ON_TOP_FRAME;
   
   static {
-    ON_TOP_FRAME.setType(Type.UTILITY);
-    ON_TOP_FRAME.setAlwaysOnTop(true);        
+    open();
   }
+  
+  public static void open() {
+    ON_TOP_FRAME = new JFrame("");
+    ON_TOP_FRAME.setType(Type.UTILITY);
+    ON_TOP_FRAME.setAlwaysOnTop(true);
+  };
+  
+  public static void reset() {
+    ON_TOP_FRAME.dispose();
+    open();
+  } 
   
   private Dialogs() {}
 

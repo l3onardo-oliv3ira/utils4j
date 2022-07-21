@@ -128,6 +128,16 @@ public class Streams {
     }
   }
   
+  public static String sha1(File file) throws IOException {
+    try(InputStream fis =  new FileInputStream(file)){
+      return DigestUtils.sha1Hex(fis);
+    }
+  }
+  
+  public static String sha1(byte[] input) throws IOException {
+    return DigestUtils.sha1Hex(input);
+  }
+  
   public static boolean isSame(Path path1, Path path2) {
     try {
       return Files.isSameFile(path2, path1);
