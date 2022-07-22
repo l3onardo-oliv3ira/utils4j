@@ -89,7 +89,7 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   }
   
   private void install() throws IOException {
-    Directory.requireFolder(folderWatching);
+    Directory.mkDir(folderWatching);
     lockFile.createNewFile();
     lock = new RandomAccessFile(lockFile, "r");
     watchService = FileSystems.getDefault().newWatchService();
@@ -104,7 +104,7 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   }
 
   private void cleanFolder() {
-    tryRun(() -> Directory.clean(folderWatching, f -> f.isFile() && !f.equals(lockFile)));
+    tryRun(() -> Directory.rmDir(folderWatching, f -> f.isFile() && !f.equals(lockFile)));
   }
 
   private void closeService() {

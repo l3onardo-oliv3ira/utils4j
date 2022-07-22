@@ -167,12 +167,6 @@ public class Args {
     return collection;
   }
 
-  public static File requireExists(File input, String message) {
-    if (input == null || !input.exists())
-      throw new IllegalArgumentException(message);
-    return input;
-  }
-
   public static long requireLong(String value, String message) {
     if (!Strings.isLong(value))
       throw new IllegalArgumentException(message);
@@ -201,12 +195,5 @@ public class Args {
     if (!Strings.isBoolean(value))
       throw new IllegalArgumentException(message);
     return Boolean.valueOf(value);
-  }
-
-  public static void requireDirectory(File dir, String message) throws IOException {
-    if (dir == null)
-      throw new FileNotFoundException(message);
-    if (!dir.isDirectory())
-      throw new IOException(message);
   }
 }

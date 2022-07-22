@@ -46,7 +46,7 @@ public class DownloadStatus implements IDownloadStatus {
   
   private final boolean rejectEmpty;
   
-  private final Optional<File> saveAt;
+  private final Optional<File> saveHere;
 
   private OutputStream out;
 
@@ -72,15 +72,15 @@ public class DownloadStatus implements IDownloadStatus {
     this(true, saveAs);
   }
 
-  public DownloadStatus(boolean rejectEmpty, File saveAt) {
+  public DownloadStatus(boolean rejectEmpty, File saveHere) {
     this.rejectEmpty = rejectEmpty;
-    this.saveAt = Optional.ofNullable(saveAt);
+    this.saveHere = Optional.ofNullable(saveHere);
   }
 
   @Override
   public final OutputStream onNewTry() throws IOException {
     checkIfOffline();
-    file = saveAt.orElseGet(() -> tryCall(() -> createTempFile("downloaded_tmp", ".utils4j.tmp"), new File("*unabled to create temp file*")));
+    file = saveHere.orElseGet(() -> tryCall(() -> createTempFile("downloaded_tmp", ".utils4j.tmp"), new File("*unabled to create temp file*")));
     out = new FileOutputStream(file) {
       @Override
       public void close() throws IOException {

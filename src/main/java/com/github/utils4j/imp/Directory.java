@@ -38,11 +38,36 @@ import java.util.stream.Stream;
 public abstract class Directory {
   private Directory() {}
   
-  public static void clean(Path path) throws IOException {
-    clean(path, (f) -> true);
+  public static void rmDir(Path path) throws IOException {
+    rmDir(path, (f) -> true);
   }
   
-  public static void clean(Path path, Predicate<File> predicate) throws IOException {
+  public static void mkDir(Path path) throws IOException {
+    Args.requireNonNull(path, "path is null");
+    mkDir(path.toFile());
+  }
+  
+  public static void requireDirectory(File dir, String message) throws IOException {
+    Args.requireNonNull(dir, "input is null");
+    if (!dir.isDirectory())
+      throw new IOException(message);
+  }
+  
+  public static File requireNotExists(File input, String message) throws IOException {
+    Args.requireNonNull(input, "input is null");
+    if (input.exists()) 
+      throw new IOException(message);
+    return input;
+  }
+  
+  public static File requireExists(File input, String message) throws IOException {
+    Args.requireNonNull(input, "input is null");
+    if (!input.exists())
+      throw new IOException(message);
+    return input;
+  }
+  
+  public static void rmDir(Path path, Predicate<File> predicate) throws IOException {
     try (Stream<Path> walk = Files.walk(path)) {        
       walk.sorted(Comparator.reverseOrder())
         .map(Path::toFile)
@@ -50,15 +75,17 @@ public abstract class Directory {
         .forEach(File::delete);
     }
   }
-  
-  public static void requireFolder(Path path) throws IOException {
-    Args.requireNonNull(path, "path is null");
-    File f = path.toFile();
-    if (f.exists() && f.isDirectory())
-      return;
-    f.delete();
-    if (!f.mkdirs()) {
-      throw new IOException("Unabled to create folder " + f.getAbsolutePath());
+
+  public static void mkDir(File folder) throws IOException {
+    Args.requireNonNull(folder, "folder is null");
+    if (folder.exists()) {
+      if (folder.isDirectory())
+        return;      
+      if (!folder.delete())
+        throw new IOException("Unabled to delete file " + folder);
     }
-  }
+    if (!folder.mkdirs()) {
+      throw new IOException("Unabled to create directory tree  " + folder);
+    }
+  }  
 }
