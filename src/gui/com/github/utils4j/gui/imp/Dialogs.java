@@ -27,26 +27,38 @@
 
 package com.github.utils4j.gui.imp;
 
+import static com.github.utils4j.gui.imp.Dialogs.Choice.CANCEL;
+import static javax.swing.JFileChooser.APPROVE_OPTION;
+import static javax.swing.JOptionPane.CANCEL_OPTION;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.NO_OPTION;
+import static javax.swing.JOptionPane.QUESTION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import static javax.swing.JOptionPane.YES_NO_CANCEL_OPTION;
+import static javax.swing.JOptionPane.YES_NO_OPTION;
+import static javax.swing.JOptionPane.YES_OPTION;
+import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showInputDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 import java.awt.Window.Type;
 import java.io.File;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class Dialogs {
+import com.github.utils4j.imp.function.Functions;
+
+public final class Dialogs {
   
-  public static enum Choice {
-    YES,
-    NO,
-    CANCEL
-  }
+  private Dialogs() {}
 
   static {
     UIManager.put("OptionPane.cancelButtonText", "Cancelar");
@@ -55,62 +67,53 @@ public class Dialogs {
     UIManager.put("OptionPane.yesButtonText", "Sim"); 
   }
   
-  private static JFrame createFrame() {
-    JFrame frame = new JFrame("");
-    frame.setType(Type.UTILITY);
-    frame.setAlwaysOnTop(true);
-    return frame;
-  };
-  
-  private Dialogs() {}
+  public static enum Choice {
+    YES,
+    NO,
+    CANCEL
+  }
+
+  private static <T> T invoke(Function<JFrame, T> function) {
+    JFrame top = new JFrame("");
+    top.setType(Type.UTILITY);
+    top.setAlwaysOnTop(true);
+    try { 
+      return function.apply(top); 
+    } finally { 
+      top.dispose(); 
+    }
+  }
+
+  private static <T> T consume(Consumer<JFrame> consumer) {
+    return invoke(Functions.toFunction(consumer));
+  }
 
   public static String input(final String message, final Object defaultValue) {
-    JFrame frame = createFrame();
-    try {
-      return JOptionPane.showInputDialog(frame, message, defaultValue);
-    } finally {
-      frame.dispose();
-    }
+    return invoke(f -> showInputDialog(f, message, defaultValue));
   }
 
   public static void warning(final String message) {
-    JFrame frame = createFrame();
-    try {
-      JOptionPane.showMessageDialog(frame, message, "Informação", JOptionPane.WARNING_MESSAGE);
-    } finally {
-      frame.dispose();
-    }
+    consume(f -> showMessageDialog(f, message, "Informação", WARNING_MESSAGE));
   }
   
   public static void info(final String message) {
-    JOptionPane.showMessageDialog(null, message, "Informação", JOptionPane.INFORMATION_MESSAGE); 
+    consume(f -> showMessageDialog(f, message, "Informação", INFORMATION_MESSAGE));
   }
   
   public static void error(final String message) {
-    JFrame frame = createFrame();
-    try {
-      JOptionPane.showMessageDialog(frame, message, "Erro", JOptionPane.ERROR_MESSAGE);
-    } finally {
-      frame.dispose();
-    }
+    consume(f -> showMessageDialog(f, message, "Erro", ERROR_MESSAGE));
   }
 
   public static Choice yesNo(final String message, final String title, final boolean cancelOption) {
-    final int options = cancelOption ? JOptionPane.YES_NO_CANCEL_OPTION : JOptionPane.YES_NO_OPTION;
-    int answer;
-    JFrame frame = createFrame();
-    try {
-      answer = JOptionPane.showConfirmDialog(frame, message, title, options);
-    } finally {
-      frame.dispose();
-    }
+    final int options = cancelOption ? YES_NO_CANCEL_OPTION : YES_NO_OPTION;
+    int answer = invoke(f -> showConfirmDialog(f, message, title, options));
     switch (answer) {
-    case JOptionPane.YES_OPTION:
+    case YES_OPTION:
       return Choice.YES;
-    case JOptionPane.NO_OPTION:
+    case NO_OPTION:
       return Choice.NO;
-    case JOptionPane.CANCEL_OPTION:
-      return Choice.CANCEL;
+    case CANCEL_OPTION:
+      return CANCEL;
     }
     return Choice.CANCEL;
   }
@@ -122,7 +125,7 @@ public class Dialogs {
     String fileName = null;
     for (;;) {
       final int result = openFile ? chooser.showOpenDialog(null) : chooser.showSaveDialog(null);
-      if (result != JFileChooser.APPROVE_OPTION) {
+      if (result != APPROVE_OPTION) {
         return null;
       }
       fileName = chooser.getSelectedFile().getAbsolutePath();
@@ -154,20 +157,17 @@ public class Dialogs {
   
   @SuppressWarnings("unchecked")
   public static <T> Optional<T> getOption(String message, final T[] options, final T defaultOption) {
-    JFrame frame = createFrame();
-    try {
-      return (Optional<T>)Optional.ofNullable(showInputDialog(
-          frame, 
-          message, 
-          "Opções", 
-          JOptionPane.QUESTION_MESSAGE, 
-          null, 
-          options, 
-          defaultOption)
-        );
-    } finally {
-      frame.dispose();
-    }
+    return invoke(f -> (Optional<T>)Optional.ofNullable(
+      showInputDialog(
+        f, 
+        message, 
+        "Opções", 
+        QUESTION_MESSAGE, 
+        null, 
+        options, 
+        defaultOption)
+      )
+    );
   }
 
   public static Integer getInteger(final String message, final Integer defaultValue) {
@@ -348,7 +348,7 @@ public class Dialogs {
   
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
-      Choice c = yesNo("LEONARDO OLIVEIRA", "titulo", true); 
+      Choice c = yesNo("LEONARDO OLIVEIRA", "titulo", false); 
       System.out.println(c.toString());
     });
   }

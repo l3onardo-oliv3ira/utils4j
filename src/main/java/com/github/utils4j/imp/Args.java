@@ -28,6 +28,8 @@
 package com.github.utils4j.imp;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -199,5 +201,12 @@ public class Args {
     if (!Strings.isBoolean(value))
       throw new IllegalArgumentException(message);
     return Boolean.valueOf(value);
+  }
+
+  public static void requireDirectory(File dir, String message) throws IOException {
+    if (dir == null)
+      throw new FileNotFoundException(message);
+    if (!dir.isDirectory())
+      throw new IOException(message);
   }
 }

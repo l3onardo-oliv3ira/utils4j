@@ -27,8 +27,22 @@
 
 package com.github.utils4j.imp.function;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 public final class Functions {
   private Functions() {}
   
   public static final java.lang.Runnable EMPTY_RUNNABLE = () -> {};
+  
+  public static <T, R> Function<T, R> toFunction(Consumer<T> consumer) {
+    return toFunction(consumer, null);
+  }
+  
+  public static <T, R> Function<T, R> toFunction(Consumer<T> consumer, R r) {
+    return t -> {
+      consumer.accept(t);
+      return r;
+    };
+  }
 }
