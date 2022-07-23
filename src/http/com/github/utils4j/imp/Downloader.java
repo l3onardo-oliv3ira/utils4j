@@ -15,13 +15,21 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public class Downloader implements IDownloader {
   
+  private final String rootUri;  
+
   private final IGetCodec codec;
   
-  private final BehaviorSubject<HttpUriRequest> status = BehaviorSubject.create();  
+  private final BehaviorSubject<HttpUriRequest> status = BehaviorSubject.create();
 
-  public Downloader(CloseableHttpClient client) {
+  public Downloader(String rootUri, CloseableHttpClient client) {
+    this.rootUri = Args.requireNonNull(rootUri, "root Uri is null");
     this.codec = new DownloaderCodec(client);
   }
+  
+  @Override
+  public final String match(String path) {
+    return rootUri + path;
+  }  
   
   @Override
   public final Observable<HttpUriRequest> newRequest() {
@@ -42,7 +50,7 @@ public class Downloader implements IDownloader {
   }
   
   private HttpGet createRequest(String uri) {
-    HttpGet r = new HttpGet(uri);
+    HttpGet r = new HttpGet(match(uri));
     status.onNext(r);
     return r;
   }
@@ -62,5 +70,5 @@ public class Downloader implements IDownloader {
     protected Void success() {
       return null;
     }    
-  }  
+  }
 }

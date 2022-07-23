@@ -28,7 +28,7 @@
 package com.github.utils4j.imp.function;
 
 @FunctionalInterface
-public interface Supplier<T> {
-  T get() throws Exception;
+public interface ICreator<T, R, E extends Exception> {
+  R create(T t) throws E;
 }
 

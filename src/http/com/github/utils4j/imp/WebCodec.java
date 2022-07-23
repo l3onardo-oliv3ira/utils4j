@@ -44,7 +44,7 @@ import com.github.utils4j.IConstants;
 import com.github.utils4j.IDownloadStatus;
 import com.github.utils4j.IResultChecker;
 import com.github.utils4j.ISocketCodec;
-import com.github.utils4j.imp.function.Supplier;
+import com.github.utils4j.imp.function.IProvider;
 
 public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
 
@@ -64,9 +64,9 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
   }
 
   @Override
-  public R post(final Supplier<HttpPost> supplier, IResultChecker checkResults) throws Exception {
+  public R post(final IProvider<HttpPost> provider, IResultChecker checkResults) throws Exception {
     try {      
-      final HttpPost post = supplier.get();
+      final HttpPost post = provider.get();
 
       try(CloseableHttpResponse response = client.execute(post)) {
         int code = response.getCode();
@@ -83,7 +83,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
           } finally {
             EntityUtils.consumeQuietly(entity);
           }
-          checkResults.run(responseText);
+          checkResults.handle(responseText);
         }
         return success();
       }
@@ -93,7 +93,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
   }
   
   @Override
-  public void get(Supplier<HttpGet> supplier, IDownloadStatus status) throws Exception {
+  public void get(IProvider<HttpGet> supplier, IDownloadStatus status) throws Exception {
     
     try(OutputStream output = status.onNewTry()) {
       final HttpGet get = supplier.get();

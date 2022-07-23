@@ -8,6 +8,8 @@ import io.reactivex.Observable;
 
 public interface IDownloader {
   Observable<HttpUriRequest> newRequest();
+  
+  String match(String uri);
 
   void download(String url, IDownloadStatus status) throws IOException;
 }

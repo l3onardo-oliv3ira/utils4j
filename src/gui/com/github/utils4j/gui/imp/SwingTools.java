@@ -45,15 +45,15 @@ import javax.swing.SwingUtilities;
 import com.github.utils4j.imp.Args;
 import com.github.utils4j.imp.Jvms;
 import com.github.utils4j.imp.Stack;
-import com.github.utils4j.imp.function.Procedure;
-import com.github.utils4j.imp.function.Supplier;
+import com.github.utils4j.imp.function.IProcedure;
+import com.github.utils4j.imp.function.IProvider;
 
 public class SwingTools {
   
   private SwingTools() {}
   
-  public static boolean isTrue(Supplier<Boolean> supplier){
-    return invokeAndWait(supplier).orElse(Boolean.FALSE);
+  public static boolean isTrue(IProvider<Boolean> provider){
+    return invokeAndWait(provider).orElse(Boolean.FALSE);
   }
   
   public static boolean invokeAndWait(Runnable code) {
@@ -62,7 +62,7 @@ public class SwingTools {
 
   public static boolean invokeAndWait(Runnable code, boolean defaultIfFail) {
     Args.requireNonNull(code, "code is null");    
-    Procedure<Boolean, ?> p = SwingUtilities.isEventDispatchThread() ? 
+    IProcedure<Boolean, ?> p = SwingUtilities.isEventDispatchThread() ? 
       () -> { code.run(); return true; } : 
       () -> { SwingUtilities.invokeAndWait(code); return true;};
     return tryCall(p, defaultIfFail);
@@ -77,17 +77,17 @@ public class SwingTools {
     }
   }
 
-  public static <T> Optional<T> invokeAndWaitT(Supplier<Optional<T>> supplier){
-    return invokeAndWait(() -> supplier.get().orElse(null));
+  public static <T> Optional<T> invokeAndWaitT(IProvider<Optional<T>> provider){
+    return invokeAndWait(() -> provider.get().orElse(null));
   }
   
-  public static <T> Optional<T> invokeAndWait(Supplier<T> supplier){
-    Args.requireNonNull(supplier, "supplier is null");
-    Procedure<Optional<T>, ?> p = SwingUtilities.isEventDispatchThread() ? 
-      () -> ofNullable(supplier.get()) : 
+  public static <T> Optional<T> invokeAndWait(IProvider<T> provider){
+    Args.requireNonNull(provider, "provider is null");
+    IProcedure<Optional<T>, ?> p = SwingUtilities.isEventDispatchThread() ? 
+      () -> ofNullable(provider.get()) : 
       () -> {
         final AtomicReference<T> ref = new AtomicReference<>();
-        SwingUtilities.invokeAndWait(() -> tryRuntime(() -> ref.set(supplier.get())));
+        SwingUtilities.invokeAndWait(() -> tryRuntime(() -> ref.set(provider.get())));
         return ofNullable(ref.get());
       };
     return tryCall(p, empty());

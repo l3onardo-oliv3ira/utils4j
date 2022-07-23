@@ -60,7 +60,11 @@ public class DownloadStatus implements IDownloadStatus {
   }
   
   public DownloadStatus() {
-    this(true, null);
+    this(true);
+  }
+  
+  public DownloadStatus(boolean rejectEmpty) {
+    this(rejectEmpty, null);
   }
   
   public DownloadStatus(File output) {

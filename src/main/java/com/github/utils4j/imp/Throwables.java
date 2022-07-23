@@ -45,8 +45,8 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.utils4j.imp.function.Executable;
-import com.github.utils4j.imp.function.Procedure;
+import com.github.utils4j.imp.function.IExecutable;
+import com.github.utils4j.imp.function.IProcedure;
 
 public final class Throwables {
   
@@ -56,19 +56,19 @@ public final class Throwables {
   
   private Throwables() {}
   
-  public static boolean tryRun(Executable<?> e) {
+  public static boolean tryRun(IExecutable<?> e) {
     return tryRun(e, false);
   }
   
-  public static <E extends Exception> boolean tryRun(Procedure<Boolean, E> procedure) { 
+  public static <E extends Exception> boolean tryRun(IProcedure<Boolean, E> procedure) { 
     return tryRun(procedure, false);
   }
 
-  public static boolean tryRun(Executable<?> e, boolean defaultIfFail) {
+  public static boolean tryRun(IExecutable<?> e, boolean defaultIfFail) {
     return tryRun(e, defaultIfFail, false);
   }
 
-  public static boolean tryRun(Executable<?> e, boolean defaultIfFail, boolean logQuietly) {
+  public static boolean tryRun(IExecutable<?> e, boolean defaultIfFail, boolean logQuietly) {
     try {
       e.execute();
       return true;
@@ -80,7 +80,7 @@ public final class Throwables {
     }
   }
   
-  public static <E extends Exception> boolean tryRun(Procedure<Boolean, E> procedure, boolean logQuietly) {
+  public static <E extends Exception> boolean tryRun(IProcedure<Boolean, E> procedure, boolean logQuietly) {
     try {
       return procedure.call();
     }catch(Exception ex) {
@@ -91,7 +91,7 @@ public final class Throwables {
     }
   }
   
-  public static Optional<Exception> tryCatch(Executable<?> e) {
+  public static Optional<Exception> tryCatch(IExecutable<?> e) {
     try {
       e.execute();
       return Optional.empty();
@@ -100,7 +100,7 @@ public final class Throwables {
     }
   }
   
-  public static void tryCatch(Executable<?> e, Consumer<Exception> catchBlock) {
+  public static void tryCatch(IExecutable<?> e, Consumer<Exception> catchBlock) {
     try {
       e.execute();
     }catch(Exception ex) {
@@ -108,7 +108,7 @@ public final class Throwables {
     }
   }
   
-  public static Optional<Exception> tryCatch(Procedure<?, Exception> p) {
+  public static Optional<Exception> tryCatch(IProcedure<?, Exception> p) {
     try {
       p.call();
       return Optional.empty();
@@ -117,7 +117,7 @@ public final class Throwables {
     }
   }
   
-  public static void tryCatch(Procedure<?, Exception> p, Consumer<Exception> catchBlock) {
+  public static void tryCatch(IProcedure<?, Exception> p, Consumer<Exception> catchBlock) {
     try {
       p.call();
     }catch(Exception ex) {
@@ -125,7 +125,7 @@ public final class Throwables {
     }
   }
   
-  public static void tryRuntime(Executable<?> e) {
+  public static void tryRuntime(IExecutable<?> e) {
     try {
       e.execute();
     }catch(RuntimeException rte) {
@@ -135,7 +135,7 @@ public final class Throwables {
     }
   }
   
-  public static void tryRuntime(Executable<?> e, String message) {
+  public static void tryRuntime(IExecutable<?> e, String message) {
     try {
       e.execute();
     }catch(Exception ex) {
@@ -143,19 +143,19 @@ public final class Throwables {
     }
   }
 
-  public static <T, E extends Exception> T tryRuntime(Procedure<T, E> procedure) {
+  public static <T, E extends Exception> T tryRuntime(IProcedure<T, E> procedure) {
     return tryRuntime(procedure, "");
   }
 
-  public static <T, E extends Exception> T tryRuntime(Procedure<T, E> procedure, String throwMessageIfFail) {
+  public static <T, E extends Exception> T tryRuntime(IProcedure<T, E> procedure, String throwMessageIfFail) {
     return tryRuntime(procedure, () -> throwMessageIfFail);
   }
   
-  public static <T, E extends Exception> T tryRuntime(Procedure<T, E> procedure, Supplier<String> throwMessageIfFail) {
+  public static <T, E extends Exception> T tryRuntime(IProcedure<T, E> procedure, Supplier<String> throwMessageIfFail) {
     return tryRuntime(procedure, (ex) -> new RuntimeException(Strings.needText(throwMessageIfFail.get(), "tryRuntime fail"), ex));
   }
   
-  public static <T, E extends Exception> T tryRuntime(Procedure<T, E> procedure, Function<Exception, RuntimeException> wrapper) {
+  public static <T, E extends Exception> T tryRuntime(IProcedure<T, E> procedure, Function<Exception, RuntimeException> wrapper) {
     try {
       return procedure.call();
     }catch(Exception ex) {
@@ -163,27 +163,27 @@ public final class Throwables {
     }
   }
   
-  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, T defaultIfFail) {
+  public static <T, E extends Exception> T tryCall(IProcedure<T, E> procedure, T defaultIfFail) {
     return tryCall(procedure, defaultIfFail, false);
   }
   
-  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, T defaultIfFail, Runnable finallyBlock) {
+  public static <T, E extends Exception> T tryCall(IProcedure<T, E> procedure, T defaultIfFail, Runnable finallyBlock) {
     return tryCall(procedure, defaultIfFail, false, finallyBlock);
   }
   
-  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, T defaultIfFail, boolean logQuietly, Runnable finallyBlock) {
+  public static <T, E extends Exception> T tryCall(IProcedure<T, E> procedure, T defaultIfFail, boolean logQuietly, Runnable finallyBlock) {
     return tryCall(procedure, (Supplier<T>)() -> defaultIfFail, logQuietly, finallyBlock);
   }
 
-  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, Supplier<T> defaultIfFail) {
+  public static <T, E extends Exception> T tryCall(IProcedure<T, E> procedure, Supplier<T> defaultIfFail) {
     return tryCall(procedure, defaultIfFail, false, () -> {});
   }
 
-  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, T defaultIfFail, boolean logQuietly) {
+  public static <T, E extends Exception> T tryCall(IProcedure<T, E> procedure, T defaultIfFail, boolean logQuietly) {
     return tryCall(procedure, (Supplier<T>)() -> defaultIfFail, logQuietly, () -> {});
   }
   
-  public static <T, E extends Exception> T tryCall(Procedure<T, E> procedure, Supplier<T> defaultIfFail, boolean logQuietly, Runnable finallyBlock) {
+  public static <T, E extends Exception> T tryCall(IProcedure<T, E> procedure, Supplier<T> defaultIfFail, boolean logQuietly, Runnable finallyBlock) {
     try {
       return procedure.call();
     }catch(Exception e) {

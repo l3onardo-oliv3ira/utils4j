@@ -28,7 +28,7 @@
 package com.github.utils4j.imp.function;
 
 @FunctionalInterface
-public interface Advancer<T> {
-  T next();
+public interface IProvider<T> {
+  T get() throws Exception;
 }
 

@@ -35,5 +35,4 @@ public interface IFilePacker<T extends Exception> extends ILifeCycle<T> {
   void reset();
 
   List<File> filePackage() throws InterruptedException;
-  
 }

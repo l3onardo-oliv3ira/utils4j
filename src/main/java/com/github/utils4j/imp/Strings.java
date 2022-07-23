@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.utils4j.imp.function.Supplier;
+import com.github.utils4j.imp.function.IProvider;
 
 public final class Strings {
 
@@ -62,9 +62,9 @@ public final class Strings {
   private Strings() {
   }
 
-  public static <T> Optional<T> get(Supplier<T> s, T defaultIfFail) {
+  public static <T> Optional<T> get(IProvider<T> p, T defaultIfFail) {
     try {
-      return Optional.ofNullable(s.get());
+      return Optional.ofNullable(p.get());
     }catch (Exception e){
       return Optional.ofNullable(defaultIfFail);
     }

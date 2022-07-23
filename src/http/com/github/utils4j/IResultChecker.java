@@ -27,8 +27,8 @@
 
 package com.github.utils4j;
 
-import com.github.utils4j.imp.function.Runnable;
+import com.github.utils4j.imp.function.IHandler;
 
-public interface IResultChecker extends Runnable<String, Exception> {
+public interface IResultChecker extends IHandler<String, Exception> {
   static IResultChecker NOTHING = (r) -> {};
 }
