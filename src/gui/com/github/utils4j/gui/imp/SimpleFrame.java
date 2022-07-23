@@ -50,7 +50,7 @@ public class SimpleFrame extends JEscFrame {
   public void showToFront(){
     SwingTools.showToFront(this);
   }  
-
+  
   public void close() {
     this.setVisible(false);
     this.dispose();
