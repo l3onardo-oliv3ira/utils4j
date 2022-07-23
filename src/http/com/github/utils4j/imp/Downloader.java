@@ -15,11 +15,11 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public class Downloader implements IDownloader {
   
-  private IGetCodec codec;
+  private final IGetCodec codec;
   
   private final BehaviorSubject<HttpUriRequest> status = BehaviorSubject.create();  
 
-  Downloader(CloseableHttpClient client) {
+  public Downloader(CloseableHttpClient client) {
     this.codec = new DownloaderCodec(client);
   }
   
