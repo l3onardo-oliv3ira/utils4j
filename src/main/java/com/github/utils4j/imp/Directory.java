@@ -39,7 +39,7 @@ public abstract class Directory {
   private Directory() {}
   
   public static void rmDir(Path path) throws IOException {
-    rmDir(path, (f) -> true);
+    rmDir(path, f -> true);
   }
   
   public static void mkDir(Path path) throws IOException {
@@ -68,11 +68,34 @@ public abstract class Directory {
   }
   
   public static void rmDir(Path path, Predicate<File> predicate) throws IOException {
+    Args.requireNonNull(path, "path is null");
+    Args.requireNonNull(predicate, "predicate is null");
     try (Stream<Path> walk = Files.walk(path)) {        
       walk.sorted(Comparator.reverseOrder())
         .map(Path::toFile)
         .filter(predicate)
         .forEach(File::delete);
+    }
+  }
+  
+  public static File createTempFile(String prefix) throws IOException {
+    return createTempFile(prefix, ".util4j.tmp");
+  }
+  
+  public static File createTempFile(String prefix, File directory) throws IOException {
+    return createTempFile(prefix, ".util4j.tmp", directory);
+  }
+
+  public static File createTempFile(String prefix, String suffix) throws IOException {
+    return createTempFile(prefix, suffix, null);
+  }
+  
+  public static File createTempFile(String prefix, String suffix, File directory) throws IOException {
+    Args.requireNonNull(prefix, "prefix is null");
+    try {
+      return File.createTempFile(prefix, suffix, directory);
+    }catch(Exception e) {
+      throw new IOException("Não é possível criar arquivo temporário", e);
     }
   }
 

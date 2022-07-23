@@ -29,8 +29,7 @@ package com.github.utils4j;
 
 import java.time.Duration;
 
-public interface IDurationProvider {
+public interface IHasDuration {
 
   Duration getDuration();
-
 }

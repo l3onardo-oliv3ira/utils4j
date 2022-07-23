@@ -27,9 +27,6 @@
 
 package com.github.utils4j.imp;
 
-import static com.github.utils4j.imp.Throwables.tryCall;
-import static java.io.File.createTempFile;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,16 +37,14 @@ import com.github.utils4j.IDownloadStatus;
 
 public class DownloadStatus implements IDownloadStatus {
 
-  private File file;
+  private File output;
+
+  private OutputStream out;
 
   private boolean online = false;
   
   private final boolean rejectEmpty;
   
-  private final Optional<File> saveHere;
-
-  private OutputStream out;
-
   private void checkIfOffline() {
     throwIfOnlineIs(true, "status is online");
   }
@@ -68,20 +63,22 @@ public class DownloadStatus implements IDownloadStatus {
     this(true, null);
   }
   
-  public DownloadStatus(File saveAs) {
-    this(true, saveAs);
+  public DownloadStatus(File output) {
+    this(true, output);
   }
 
-  public DownloadStatus(boolean rejectEmpty, File saveHere) {
+  public DownloadStatus(boolean rejectEmpty, File output) {
     this.rejectEmpty = rejectEmpty;
-    this.saveHere = Optional.ofNullable(saveHere);
+    this.output = output;
   }
-
+  
   @Override
   public final OutputStream onNewTry() throws IOException {
     checkIfOffline();
-    file = saveHere.orElseGet(() -> tryCall(() -> createTempFile("downloaded_tmp", ".utils4j.tmp"), new File("*unabled to create temp file*")));
-    out = new FileOutputStream(file) {
+    if (output == null) {
+      output = Directory.createTempFile("downloaded");
+    }
+    out = new FileOutputStream(output) {
       @Override
       public void close() throws IOException {
         try {
@@ -123,10 +120,10 @@ public class DownloadStatus implements IDownloadStatus {
   }
 
   private void checkIfEmpty(boolean force) {
-    if (file != null) {
-      if (force || (rejectEmpty && file.length() == 0)) {
-        file.delete();
-        file = null;
+    if (output != null) {
+      if (force || (rejectEmpty && output.length() == 0)) {
+        output.delete();
+        output = null;
       }
     }
   }
@@ -134,7 +131,7 @@ public class DownloadStatus implements IDownloadStatus {
   @Override
   public final Optional<File> getDownloadedFile() {
     checkIfOffline();
-    return Optional.ofNullable(file);
+    return Optional.ofNullable(output);
   }
 
   protected void onStepStart(long total) throws InterruptedException {}
