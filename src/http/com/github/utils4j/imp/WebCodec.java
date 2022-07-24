@@ -93,10 +93,10 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
   }
   
   @Override
-  public void get(IProvider<HttpGet> supplier, IDownloadStatus status) throws Exception {
+  public void get(IProvider<HttpGet> provider, IDownloadStatus status) throws Exception {
     
     try(OutputStream output = status.onNewTry()) {
-      final HttpGet get = supplier.get();
+      final HttpGet get = provider.get();
       
       try(CloseableHttpResponse response = client.execute(get)) {
         int code = response.getCode();

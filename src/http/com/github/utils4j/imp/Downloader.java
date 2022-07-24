@@ -1,6 +1,7 @@
 package com.github.utils4j.imp;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
@@ -26,9 +27,10 @@ public class Downloader implements IDownloader {
     this.codec = new DownloaderCodec(client);
   }
   
+  
   @Override
   public final String match(String path) {
-    return rootUri + path;
+    return Strings.encodeHtmlSpace(rootUri + path);
   }  
   
   @Override
@@ -40,17 +42,18 @@ public class Downloader implements IDownloader {
   public final void download(String uri, IDownloadStatus status) throws IOException {
     Args.requireNonNull(uri, "uri is null");
     Args.requireNonNull(status, "status is null");
+    final String fullUrl = match(uri);
     try {
-      codec.get(() -> createRequest(uri), status);
+      codec.get(() -> createRequest(fullUrl), status);
     } catch (IOException e) {
       throw e;
     } catch (Throwable e) {
-      throw new IOException("Unabled to download from url: " + uri, e);
+      throw new IOException("Unabled to download from url: " + fullUrl, e);
     }
   }
   
-  private HttpGet createRequest(String uri) {
-    HttpGet r = new HttpGet(match(uri));
+  private HttpGet createRequest(String fullUrl) throws URISyntaxException {
+    HttpGet r = new HttpGet(fullUrl);
     status.onNext(r);
     return r;
   }

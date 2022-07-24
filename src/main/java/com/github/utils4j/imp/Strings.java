@@ -41,14 +41,20 @@ import java.util.Set;
 import com.github.utils4j.imp.function.IProvider;
 
 public final class Strings {
-
-  private static final String[] EMPTY_ARRAY = new String[0];
+  
+  private static final char SPACE = ' ';
 
   private static final String EMPTY = "";
 
-  private static final char SPACE = ' ';
+  private static final String HTML_SPACE = "%20";
 
   private static final String SPACE_STRING = EMPTY + SPACE;
+
+  private static final String[] EMPTY_ARRAY = new String[0];
+
+  private static final String[] HTML_SPACE_ARRAY = new String[] {HTML_SPACE};
+
+  private static final String[] SPACE_STRING_ARRAY = new String[] {SPACE_STRING};
 
   public static final Comparator<String> LATIN_COMPARATOR = new LatinComparator();
 
@@ -69,7 +75,7 @@ public final class Strings {
       return Optional.ofNullable(defaultIfFail);
     }
   }
-
+  
   public static Optional<String> optional(String text) {
     return Optional.ofNullable(textOrNull(text));
   }
@@ -2700,5 +2706,9 @@ public final class Strings {
   public static String replaceEach(final String text, final String[] searchList, final String[] replacementList) {
     final int timeToLive = searchList == null ? 0 : searchList.length;
     return replaceEach(text, searchList, replacementList, true, timeToLive);
+  }
+  
+  public static String encodeHtmlSpace(String url) {
+    return replaceEach(url, SPACE_STRING_ARRAY, HTML_SPACE_ARRAY);
   }
 }
