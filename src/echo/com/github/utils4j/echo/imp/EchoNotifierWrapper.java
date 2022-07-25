@@ -24,27 +24,46 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.imp;
+package com.github.utils4j.echo.imp;
 
-import java.io.IOException;
+import com.github.utils4j.echo.IEchoNotifier;
+import com.github.utils4j.imp.Args;
 
-import com.github.utils4j.IAcumulator;
+public class EchoNotifierWrapper implements IEchoNotifier {
 
-public class LineAppender implements IAcumulator<String> {
-  private final StringBuilder sb = new StringBuilder();
-
-  @Override
-  public String get() {
-    return sb.toString();
+  private final IEchoNotifier notifier;
+  
+  protected EchoNotifierWrapper(IEchoNotifier notifier) {
+    this.notifier = Args.requireNonNull(notifier, "notifier is null");
   }
 
   @Override
-  public void accept(String line) {
-    sb.append(line).append(System.lineSeparator());
+  public void accept(String t) {
+    notifier.accept(t);
   }
 
   @Override
-  public String handleFail(IOException e) {
-    return get();
+  public void open() {
+    notifier.open();
+  }
+
+  @Override
+  public boolean isOpen() {
+    return notifier.isOpen();
+  }
+
+  @Override
+  public void close() {
+    notifier.close();
+  }
+
+  @Override
+  public boolean isVisible() {
+    return notifier.isVisible();
+  }
+
+  @Override
+  public void show() {
+    notifier.show();
   }
 }

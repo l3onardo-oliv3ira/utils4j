@@ -37,6 +37,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import com.github.utils4j.imp.function.Predicates;
 
 public class Containers {
   private Containers() {
@@ -83,11 +87,17 @@ public class Containers {
   public static boolean isEmpty(byte[] value) {
     return value == null || value.length == 0;    
   }
-
+  
+  @SafeVarargs
   public static <T> List<T> arrayList(T... array) {
-    return new ArrayList<T>(Arrays.asList(array));
+    return arrayList(Predicates.all(), array);
   }
   
+  @SafeVarargs
+  public static <T> List<T> arrayList(Predicate<T> filter, T... array) {
+    return Arrays.asList(array).stream().filter(filter).collect(Collectors.toList());
+  }
+
   public static String[] arrayOf(List<String> container) {
     if (container == null)
       return null;

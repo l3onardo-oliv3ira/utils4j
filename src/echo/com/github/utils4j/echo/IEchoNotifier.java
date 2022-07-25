@@ -24,27 +24,15 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.imp;
+package com.github.utils4j.echo;
 
-import java.io.IOException;
+import java.util.function.Consumer;
 
-import com.github.utils4j.IAcumulator;
+public interface IEchoNotifier extends Consumer<String> {
+  boolean isOpen();
+  boolean isVisible();
 
-public class LineAppender implements IAcumulator<String> {
-  private final StringBuilder sb = new StringBuilder();
-
-  @Override
-  public String get() {
-    return sb.toString();
-  }
-
-  @Override
-  public void accept(String line) {
-    sb.append(line).append(System.lineSeparator());
-  }
-
-  @Override
-  public String handleFail(IOException e) {
-    return get();
-  }
+  void show();
+  void open();
+  void close();
 }

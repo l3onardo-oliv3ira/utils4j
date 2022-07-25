@@ -24,27 +24,39 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.imp;
+package com.github.utils4j.echo.gui;
 
-import java.io.IOException;
+import java.awt.event.ActionEvent;
 
-import com.github.utils4j.IAcumulator;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-public class LineAppender implements IAcumulator<String> {
-  private final StringBuilder sb = new StringBuilder();
+import io.reactivex.Observable;
 
-  @Override
-  public String get() {
-    return sb.toString();
+public abstract class LogoEchoFrame extends EchoFrame {
+
+  private static final long serialVersionUID = 1L;
+
+  public LogoEchoFrame(Observable<String> echoCallback) {
+    super(echoCallback);
+  }
+  
+  public LogoEchoFrame(String title, String headerItemFormat, Observable<String> echoCallback) {
+    super(title, headerItemFormat, echoCallback);
   }
 
   @Override
-  public void accept(String line) {
-    sb.append(line).append(System.lineSeparator());
+  protected JPanel north() {
+    JPanel north = super.north();
+    north.add("center", new JLabel(getLogo()));
+    return north;
+  }
+  
+  @Override
+  protected void onEscPressed(ActionEvent e) {
+    this.setVisible(false);
   }
 
-  @Override
-  public String handleFail(IOException e) {
-    return get();
-  }
+  protected abstract Icon getLogo();
 }

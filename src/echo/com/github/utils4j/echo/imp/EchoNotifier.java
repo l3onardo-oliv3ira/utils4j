@@ -24,27 +24,72 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.imp;
+package com.github.utils4j.echo.imp;
 
-import java.io.IOException;
+import com.github.utils4j.echo.IEchoNotifier;
 
-import com.github.utils4j.IAcumulator;
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 
-public class LineAppender implements IAcumulator<String> {
-  private final StringBuilder sb = new StringBuilder();
+public abstract class EchoNotifier implements IEchoNotifier {
+
+  private BehaviorSubject<String> echo;
 
   @Override
-  public String get() {
-    return sb.toString();
+  public final boolean isOpen() {
+    return echo != null;
   }
 
   @Override
-  public void accept(String line) {
-    sb.append(line).append(System.lineSeparator());
+  public final void open() {
+    if (!isOpen()) {
+      doOpen();
+    }
+  }
+  
+  protected final Observable<String> getEcho() {
+    return echo;
+  }
+
+  protected void doOpen() {
+    this.echo = BehaviorSubject.create();
+  }
+  
+  @Override
+  public final void accept(String message) {
+    show();
+    echo.onNext(message);
   }
 
   @Override
-  public String handleFail(IOException e) {
-    return get();
+  public final void close() {
+    if (isOpen()) {
+      doClose();
+    }
   }
+
+  protected void doClose() {
+    if (echo != null) {
+      echo.onComplete();
+      echo = null;
+    }
+  }
+
+  @Override
+  public final boolean isVisible() {
+    return isOpen() && isDisplayed();
+  }
+
+  @Override
+  public final void show() {
+    open();
+    if (!isVisible()) {
+      display();
+    }
+  }
+  
+  protected abstract void display();
+
+  protected abstract boolean isDisplayed();
+
 }

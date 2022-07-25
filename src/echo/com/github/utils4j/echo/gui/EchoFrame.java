@@ -1,4 +1,30 @@
-package com.github.utils4j.gui.imp;
+/*
+* MIT License
+* 
+* Copyright (c) 2022 Leonardo de Lima Oliveira
+* 
+* https://github.com/l3onardo-oliv3ira
+* 
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*/
+
+package com.github.utils4j.echo.gui;
 
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
 import static com.github.utils4j.gui.imp.SwingTools.setFixedMinimumSize;
@@ -8,9 +34,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,18 +42,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
+import com.github.utils4j.gui.imp.SimpleFrame;
 import com.github.utils4j.imp.Args;
-import com.github.utils4j.imp.Strings;
-import com.github.utils4j.imp.Threads;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.BehaviorSubject;
 import net.miginfocom.swing.MigLayout;
 
 public class EchoFrame extends SimpleFrame {
 
-  private static final Dimension MININUM_SIZE = new Dimension(500, 680);
+  private static final Dimension MININUM_SIZE = new Dimension(300, 350);
+  
+  private static final Dimension DEFAULT_SIZE = new Dimension(500, 680);
 
   private static final int MAX_ITEM_COUNT = 800;
   
@@ -86,7 +109,12 @@ public class EchoFrame extends SimpleFrame {
   private void setup() {
     setupLayout();
     setFixedMinimumSize(this, MININUM_SIZE);
-    setLocationRelativeTo(null);
+    setBounds(getBounds().x, getBounds().y, DEFAULT_SIZE.width, DEFAULT_SIZE.height);
+    setupLocation();
+  }
+  
+  protected void setupLocation() {
+    setLocationRelativeTo(null);  
   }
   
   private JScrollPane center() {
@@ -127,32 +155,4 @@ public class EchoFrame extends SimpleFrame {
     southPane.add(fechar);
     return southPane;
   }
-  
-  public static void main(String[] args) throws InterruptedException {
-  
-    final BehaviorSubject<String> subject = BehaviorSubject.create();
-    
-    final EchoFrame dialog = new EchoFrame(subject);
-    
-    invokeLater(() -> dialog.showToFront());
-    
-    Threads.startAsync(() -> {
-      final BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-      String line;
-      try {
-        while(Strings.hasText((line = console.readLine()))) {
-          subject.onNext(line);
-        }
-      } catch (IOException e) {
-        subject.onError(e);
-      } finally {
-        subject.onComplete();
-      }
-    }).join();
-    
-    dialog.close();
-    
-    System.out.println("Fim");
-  }
-
 }

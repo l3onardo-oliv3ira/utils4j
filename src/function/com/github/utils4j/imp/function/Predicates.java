@@ -24,27 +24,18 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.imp;
+package com.github.utils4j.imp.function;
 
-import java.io.IOException;
+import java.util.function.Predicate;
 
-import com.github.utils4j.IAcumulator;
+public final class Predicates {
+  private Predicates() {}
 
-public class LineAppender implements IAcumulator<String> {
-  private final StringBuilder sb = new StringBuilder();
-
-  @Override
-  public String get() {
-    return sb.toString();
+  public static final <T> Predicate<T> notNull() {
+    return t -> t != null;
   }
-
-  @Override
-  public void accept(String line) {
-    sb.append(line).append(System.lineSeparator());
-  }
-
-  @Override
-  public String handleFail(IOException e) {
-    return get();
+  
+  public static final <T> Predicate<T> all() {
+    return t -> true;
   }
 }

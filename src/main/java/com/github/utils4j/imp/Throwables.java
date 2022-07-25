@@ -163,6 +163,10 @@ public final class Throwables {
     }
   }
   
+  public static <T, E extends Exception> Optional<T> tryCall(IProcedure<T, E> procedure) {
+    return Optional.ofNullable(tryCall(procedure, (T)null));
+  }
+  
   public static <T, E extends Exception> T tryCall(IProcedure<T, E> procedure, T defaultIfFail) {
     return tryCall(procedure, defaultIfFail, false);
   }

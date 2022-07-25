@@ -26,6 +26,7 @@
 
 
 package com.github.utils4j.gui.imp;
+
 import static com.github.utils4j.imp.Threads.startAsync;
 import static com.github.utils4j.imp.Throwables.tryCall;
 import static com.github.utils4j.imp.Throwables.tryRuntime;
