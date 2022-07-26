@@ -163,6 +163,7 @@
 		                    <source>src/thread</source>
 		                    <source>src/params</source>
 		                    <source>src/http</source>
+		                    <source>src/echo</source>
 		                </sources>
 		            </configuration>
 		        </execution>
