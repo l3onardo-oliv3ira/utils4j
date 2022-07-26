@@ -27,7 +27,6 @@
 package com.github.utils4j.echo.gui;
 
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
-import static com.github.utils4j.gui.imp.SwingTools.setFixedMinimumSize;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -108,7 +107,7 @@ public class EchoFrame extends SimpleFrame {
   
   private void setup() {
     setupLayout();
-    setFixedMinimumSize(this, MININUM_SIZE);
+    setFixedMinimumSize(MININUM_SIZE);
     setBounds(getBounds().x, getBounds().y, DEFAULT_SIZE.width, DEFAULT_SIZE.height);
     setupLocation();
   }

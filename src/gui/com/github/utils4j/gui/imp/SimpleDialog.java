@@ -27,6 +27,7 @@
 
 package com.github.utils4j.gui.imp;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Image;
 
@@ -53,6 +54,10 @@ public class SimpleDialog extends JEscDialog {
   public SimpleDialog(Frame owner, String title, Image icon, boolean modal) {
     super(owner, title, modal);
     this.setIconImage(icon);
+  }
+
+  protected void setFixedMinimumSize(Dimension dimension) {
+    SwingTools.setFixedMinimumSize(this, dimension);
   }
 
   public void showToFront(){

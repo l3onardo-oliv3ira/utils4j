@@ -28,7 +28,6 @@
 package com.github.utils4j.gui.imp;
 
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
-import static com.github.utils4j.gui.imp.SwingTools.setFixedMinimumSize;
 import static com.github.utils4j.imp.Strings.empty;
 import static com.github.utils4j.imp.Strings.optional;
 import static com.github.utils4j.imp.Strings.trim;
@@ -90,7 +89,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     createEast();
     createSouth();
     setSize(new Dimension(650, 300));
-    setFixedMinimumSize(this, new Dimension(MIN_WIDTH, MIN_HEIGHT));
+    setFixedMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
     setLocationRelativeTo(null);
     setAutoRequestFocus(true);
     setAlwaysOnTop(true);
@@ -124,13 +123,13 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   }
 
   private void createEast() {
-    JButton firstButton = new JButton(Images.FIRST.asIcon().get());
+    JButton firstButton = new JButton(Images.FIRST.asIcon());
     firstButton.addActionListener(this::onFirst);
-    JButton upButton = new JButton(Images.UP.asIcon().get());
+    JButton upButton = new JButton(Images.UP.asIcon());
     upButton.addActionListener(this::onUp);
-    JButton downButton = new JButton(Images.DOWN.asIcon().get());
+    JButton downButton = new JButton(Images.DOWN.asIcon());
     downButton.addActionListener(this::onDown);
-    JButton lastButton = new JButton(Images.LAST.asIcon().get());
+    JButton lastButton = new JButton(Images.LAST.asIcon());
     lastButton.addActionListener(this::onLast);
     JPanel eastPane = new JPanel();
     eastPane.setLayout(new MigLayout());
@@ -292,7 +291,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   public static void main(String[] args) {
     invokeLater(() -> {
       List<File> files = createListFiles();
-      IFileListView window = new FileListWindow(Images.FIRST.asImage().get(), files);
+      IFileListView window = new FileListWindow(Images.FIRST.asImage(), files);
       String fileName = window.getFileName().orElse("nada informado");
       System.out.println(fileName);
       System.exit(0);

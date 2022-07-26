@@ -27,6 +27,7 @@
 
 package com.github.utils4j.gui.imp;
 
+import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 
@@ -54,5 +55,9 @@ public class SimpleFrame extends JEscFrame {
   public void close() {
     this.setVisible(false);
     this.dispose();
+  }
+  
+  protected void setFixedMinimumSize(Dimension dimension) {
+    SwingTools.setFixedMinimumSize(this, dimension);
   }
 }

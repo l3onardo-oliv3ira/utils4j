@@ -28,7 +28,6 @@
 package com.github.utils4j.gui.imp;
 
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
-import static com.github.utils4j.gui.imp.SwingTools.setFixedMinimumSize;
 import static com.github.utils4j.imp.Strings.empty;
 import static com.github.utils4j.imp.Strings.trim;
 
@@ -88,14 +87,14 @@ public final class ExceptionAlert extends SimpleFrame {
   
   private final JPanel southPane = new JPanel();
   
-  private final JLabel seDetailLabel = new JLabel("<html><u>Ver detalhes</u></html>");
+  private final JLabel seeDetailLabel = new JLabel("<html><u>Ver detalhes</u></html>");
   
   private ExceptionAlert(Image icon, String message, String detail, Throwable cause) {
     super("Mensagem de erro", icon);
     setupLayout(message, detail, cause);
     setupListeners();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    setFixedMinimumSize(this, new Dimension(MIN_WIDTH, MIN_HEIGHT));
+    setFixedMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
     setAutoRequestFocus(true);
   }
 
@@ -113,9 +112,9 @@ public final class ExceptionAlert extends SimpleFrame {
     addWindowStateListener(new WindowStateListener() {
       public void windowStateChanged(WindowEvent e) {
         if ((e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH){
-          seDetailLabel.setText("<html><u>Esconder detalhes</u></html>");
+          seeDetailLabel.setText("<html><u>Esconder detalhes</u></html>");
         } else if ((e.getNewState() & Frame.NORMAL) == Frame.NORMAL) {
-          seDetailLabel.setText("<html><u>Ver detalhes</u></html>");
+          seeDetailLabel.setText("<html><u>Ver detalhes</u></html>");
         }
       }
    });    
@@ -157,18 +156,18 @@ public final class ExceptionAlert extends SimpleFrame {
     
     JPanel detailPanel = new JPanel();
     detailPanel.setLayout(new MigLayout("center"));
-    seDetailLabel.setVerticalAlignment(SwingConstants.BOTTOM);
-    seDetailLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    seDetailLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    seDetailLabel.setVerticalAlignment(SwingConstants.CENTER);
-    seDetailLabel.setForeground(Color.BLUE);
-    seDetailLabel.setFont(new Font("Tahoma", Font.ITALIC, 12));
-    seDetailLabel.addMouseListener(new MouseAdapter(){  
+    seeDetailLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+    seeDetailLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    seeDetailLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    seeDetailLabel.setVerticalAlignment(SwingConstants.CENTER);
+    seeDetailLabel.setForeground(Color.BLUE);
+    seeDetailLabel.setFont(new Font("Tahoma", Font.ITALIC, 12));
+    seeDetailLabel.addMouseListener(new MouseAdapter(){  
       public void mouseClicked(MouseEvent e) {
-        setDetail(seDetailLabel);
+        setDetail(seeDetailLabel);
       }
     });
-    detailPanel.add(seDetailLabel);
+    detailPanel.add(seeDetailLabel);
     northPane.add(detailPanel, "pushx, growx");
     return northPane;
   }

@@ -38,4 +38,8 @@ public final class Predicates {
   public static final <T> Predicate<T> all() {
     return t -> true;
   }
+  
+  public static final <T> Predicate<T> denyAll() {
+    return t -> false;
+  }
 }

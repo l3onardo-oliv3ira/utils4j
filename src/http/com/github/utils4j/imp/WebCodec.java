@@ -88,7 +88,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
         return success();
       }
     }catch(CancellationException e) {
-      throw launch("Operação cancelada. Os dados não foram enviados ao servidor.", e);
+      throw launch("Os dados não foram enviados ao servidor porque a operação foi CANCELADA!.", e);
     }
   }
   

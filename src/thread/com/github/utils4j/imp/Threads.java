@@ -35,7 +35,7 @@ public class Threads {
   public static void sleep(long time) {
     if (time > 0)
       try {
-        Thread.sleep(time);
+        safeSleep(time);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
@@ -67,7 +67,7 @@ public class Threads {
   }
   
   public static Thread startAsync(Runnable runnable, long delay) {
-    return startAsync("From:" + Thread.currentThread().getName(), runnable, delay);
+    return startAsync(Strings.empty(), runnable, delay);
   }
   
   public static Thread startAsync(String threadName, Runnable runnable) { 
@@ -75,12 +75,13 @@ public class Threads {
   }
 
   public static Thread startAsync(String threadName, Runnable runnable, long delay) {
-    Args.requireText(threadName, "threadName is empty");
+    Args.requireNonNull(threadName, "threadName is empty");
     Args.requireNonNull(runnable, "runnable is null");
+    Args.requireZeroPositive(delay, "delay is negative");
     Thread t = new Thread(() -> {
       Threads.sleep(delay);
       runnable.run();
-    }, threadName);
+    }, threadName + " from parent: " + Thread.currentThread().getName());
     t.start();
     return t;
   }
