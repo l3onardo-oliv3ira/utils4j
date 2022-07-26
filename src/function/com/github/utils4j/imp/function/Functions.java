@@ -45,4 +45,11 @@ public final class Functions {
       return r;
     };
   }
+  
+  public static <T> IProvider<T> discard(IExecutable<?> executable){
+    return () -> {
+      executable.execute();
+      return null;
+    };
+  }
 }

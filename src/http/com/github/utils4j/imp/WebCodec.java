@@ -26,6 +26,8 @@
 
 package com.github.utils4j.imp;
 
+import static com.github.utils4j.imp.Throwables.rootMessage;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -88,7 +90,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
         return success();
       }
     }catch(CancellationException e) {
-      throw launch("Os dados não foram enviados ao servidor porque a operação foi CANCELADA!.", e);
+      throw new InterruptedException("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e));
     }
   }
   
@@ -120,8 +122,8 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
             output.write(buffer, 0, length);
           status.onEndDownload();
             
-        } catch(InterruptedException e) {
-          throw launch("Download interrompido - HTTP Code: " + code, e);
+        } catch(InterruptedException e) {          
+          throw new InterruptedException("Download interrompido - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));
         } catch(Exception e) {
           throw launch("Falha durante o download do arquivo - HTTP Code: " + code, e);
         } finally {
