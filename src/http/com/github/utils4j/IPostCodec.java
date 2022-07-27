@@ -27,9 +27,7 @@
 
 package com.github.utils4j;
 
-
 import com.github.utils4j.imp.function.IProvider;
-
 
 public interface IPostCodec<T, R> {
   R post(IProvider<T> provider, IResultChecker checker) throws Exception ;

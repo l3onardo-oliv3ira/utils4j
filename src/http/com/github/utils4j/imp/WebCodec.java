@@ -90,7 +90,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
         return success();
       }
     }catch(CancellationException e) {
-      throw new InterruptedException("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e));
+      throw launch("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e) + (Thread.currentThread().isInterrupted() ? "SIM INTERROMPIDA" : "NAO INTERROMPIDA"));
     }
   }
   
@@ -122,7 +122,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
             output.write(buffer, 0, length);
           status.onEndDownload();
             
-        } catch(InterruptedException e) {          
+        } catch(InterruptedException e) {     
           throw new InterruptedException("Download interrompido - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));
         } catch(Exception e) {
           throw launch("Falha durante o download do arquivo - HTTP Code: " + code, e);

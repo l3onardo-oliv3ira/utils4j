@@ -111,7 +111,7 @@ public class DownloadStatus implements IDownloadStatus {
   }
 
   @Override
-  public final void onDownloadFail(Throwable e) throws InterruptedException  {
+  public final void onDownloadFail(Throwable e) {
     Streams.closeQuietly(out);
     checkIfEmpty(true);
     onStepFail(e);
@@ -140,10 +140,10 @@ public class DownloadStatus implements IDownloadStatus {
 
   protected void onStepStart(long total) throws InterruptedException {}
   
-  protected void onStepStatus(long written) throws InterruptedException { }
+  protected void onStepStatus(long written) throws InterruptedException {}
   
   protected void onStepEnd() throws InterruptedException {}
   
-  protected void onStepFail(Throwable e) throws InterruptedException {}
+  protected void onStepFail(Throwable e) {}
 
 }

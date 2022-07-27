@@ -42,7 +42,7 @@ public interface IDownloadStatus {
   
   void onStatus(long total, long written) throws InterruptedException;
 
-  void onDownloadFail(Throwable e) throws InterruptedException;
+  void onDownloadFail(Throwable e);
 
   Optional<File> getDownloadedFile();
 }
