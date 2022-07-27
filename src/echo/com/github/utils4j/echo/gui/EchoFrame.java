@@ -88,6 +88,7 @@ public class EchoFrame extends SimpleFrame {
 
   protected void clear(ActionEvent e) {
     textArea.setText(""); //auto clean
+    itemCount = 0;
   }
 
   private void handleRequest(String request) {
@@ -98,8 +99,7 @@ public class EchoFrame extends SimpleFrame {
   
   private void addItem(String item) {
     if (itemCount++ > MAX_ITEM_COUNT) {
-      clear(null);
-      itemCount = 0;
+      clear(null);      
     }
     textArea.append(String.format(headerItemFormat, itemCount));
     textArea.append(item + "\n\r\n\r");

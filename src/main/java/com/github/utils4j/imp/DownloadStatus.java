@@ -45,20 +45,6 @@ public class DownloadStatus implements IDownloadStatus {
   
   private final boolean rejectEmpty;
   
-  private void checkIfOffline() {
-    throwIfOnlineIs(true, "status is online");
-  }
-  
-  private void checkIfOnline() {
-    throwIfOnlineIs(false, "status is offline");
-  }
-
-  private void throwIfOnlineIs(boolean status, String message) {
-    if (online == status) {
-      throw new IllegalStateException(message);
-    }
-  }
-  
   public DownloadStatus() {
     this(true);
   }
@@ -74,6 +60,20 @@ public class DownloadStatus implements IDownloadStatus {
   public DownloadStatus(boolean rejectEmpty, File output) {
     this.rejectEmpty = rejectEmpty;
     this.output = output;
+  }
+  
+  private void checkIfOffline() {
+    throwIfOnlineIs(true, "status is online");
+  }
+  
+  private void checkIfOnline() {
+    throwIfOnlineIs(false, "status is offline");
+  }
+
+  private void throwIfOnlineIs(boolean status, String message) {
+    if (online == status) {
+      throw new IllegalStateException(message);
+    }
   }
   
   @Override

@@ -90,7 +90,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
         return success();
       }
     }catch(CancellationException e) {
-      throw launch("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e) + (Thread.currentThread().isInterrupted() ? "SIM INTERROMPIDA" : "NAO INTERROMPIDA"));
+      throw launch("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e));
     }
   }
   

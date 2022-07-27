@@ -46,7 +46,7 @@ public final class Functions {
     };
   }
   
-  public static <T> IProvider<T> discard(IExecutable<?> executable){
+  public static <T> IProvider<T> nullProvider(IExecutable<?> executable){
     return () -> {
       executable.execute();
       return null;
