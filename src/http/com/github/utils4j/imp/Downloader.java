@@ -49,14 +49,13 @@ public class Downloader implements IDownloader {
   private final BehaviorSubject<HttpUriRequest> status = BehaviorSubject.create();
 
   public Downloader(String rootUri, CloseableHttpClient client) {
-    this.rootUri = Args.requireNonNull(rootUri, "root Uri is null");
+    this.rootUri = Args.requireNonNull(rootUri, "root Uri is null").trim();
     this.codec = new DownloaderCodec(client);
   }
   
-  
   @Override
   public final String match(String path) {
-    return Strings.encodeHtmlSpace(rootUri + path);
+    return Strings.encodeHtmlSpace(rootUri + Strings.trim(path));
   }  
   
   @Override
