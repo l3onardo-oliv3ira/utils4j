@@ -24,7 +24,7 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.echo.gui;
+package com.github.utils4j.echo;
 
 import static com.github.utils4j.imp.Throwables.tryRun;
 
@@ -36,12 +36,21 @@ import com.github.utils4j.imp.Args;
 
 public class EchoNotifierWindow extends EchoNotifier {
   
+  private static final String DEFAULT_HEADER_FORMAT = 
+      "==========================================================================\n" +
+      " Recebida requisição %s: \n" +
+      "==========================================================================\n";
+  
   protected final String headerFormat;
 
   protected final String title;
 
   protected EchoFrame echoFrame;
 
+  public EchoNotifierWindow(String title) {
+    this(title, DEFAULT_HEADER_FORMAT);
+  }
+  
   public EchoNotifierWindow(String title, String headerFormat) {
     this.title = Args.requireNonNull(title, "title is null");
     this.headerFormat = Args.requireNonNull(headerFormat, "headerFormat is null");
@@ -53,13 +62,17 @@ public class EchoNotifierWindow extends EchoNotifier {
     echoFrame = createFrame();
   }
   
-  protected EchoFrame createFrame() {
-    return new EchoFrame(title, headerFormat, getEcho()) {
+  private final EchoFrame createFrame() {
+    return new EchoFrame(getEcho(), title, createPanel()) {
       @Override
       protected void onEscPressed(ActionEvent e) {
         super.setVisible(false);
       }
     };
+  }
+  
+  protected EchoPanel createPanel() {
+    return new EchoPanel(headerFormat);
   }
   
   @Override

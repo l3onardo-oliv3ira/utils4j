@@ -36,7 +36,9 @@ public enum Images implements IPicture {
 
   DOWN("/file-down.png"),
   
-  LAST("/file-last.png");
+  LAST("/file-last.png"),
+  
+  ECHO("/echo.png");
 
   final String path;
   

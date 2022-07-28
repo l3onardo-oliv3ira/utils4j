@@ -24,39 +24,55 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.echo.gui;
+package com.github.utils4j.echo;
 
-import java.awt.event.ActionEvent;
+import java.awt.BorderLayout;
+import java.awt.Font;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import io.reactivex.Observable;
-
-public abstract class LogoEchoFrame extends EchoFrame {
+    
+public abstract class LogoEchoPanel extends EchoPanel {
 
   private static final long serialVersionUID = 1L;
 
-  public LogoEchoFrame(Observable<String> echoCallback) {
-    super(echoCallback);
+  private JLabel header;
+  
+  public LogoEchoPanel() {
+    super();
   }
   
-  public LogoEchoFrame(String title, String headerItemFormat, Observable<String> echoCallback) {
-    super(title, headerItemFormat, echoCallback);
+  public LogoEchoPanel(String headerItemFormat) {
+    super(headerItemFormat);
   }
 
+  private JPanel middle() {
+    JPanel center = new JPanel();
+    center.add("center", new JLabel(getLogo()));
+    return center;
+  }
+  
+  private JPanel right() {
+    header = new JLabel();
+    header.setFont(new Font("Tahoma", Font.PLAIN, 22));    
+    JPanel east = new JPanel();
+    east.add("center", header);
+    return east;
+  }
+  
+  protected void onNewItem(String item, int count) {  
+    header.setText("Requisição: " + count);  
+  }
+  
   @Override
   protected JPanel north() {
-    JPanel north = super.north();
-    north.add("center", new JLabel(getLogo()));
+    JPanel north = super.north();   
+    north.setLayout(new BorderLayout(0, 0));
+    north.add(middle(), BorderLayout.CENTER);
+    north.add(right(), BorderLayout.SOUTH);
     return north;
   }
   
-  @Override
-  protected void onEscPressed(ActionEvent e) {
-    this.setVisible(false);
-  }
-
   protected abstract Icon getLogo();
 }
