@@ -24,55 +24,34 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.echo.imp;
+package com.github.utils4j.imp;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-    
-public abstract class LogoEchoPanel extends EchoPanel {
+public class Browsers {
+  private Browsers() {}
 
-  private static final long serialVersionUID = 1L;
+  public static void launch(String url) {
+    String so = System.getProperty("os.name").toLowerCase();
+    try {
+      if(Desktop.isDesktopSupported()) {
+        Desktop.getDesktop().browse(new URI(url));
+      } else {
+        Runtime runtime = Runtime.getRuntime();
+        if(so.contains("mac")) {
+          runtime.exec("open " + url);
+        } else if(so.contains("nix") || so.contains("nux")) { 
+          runtime.exec("xdg-open " + url);
+        } else {
+          ;
+        } 
+      }
+    } catch(IOException | URISyntaxException eek) {
+      ;
+    }
+  }
 
-  private JLabel header;
-  
-  public LogoEchoPanel() {
-    super();
-  }
-  
-  public LogoEchoPanel(String headerItemFormat) {
-    super(headerItemFormat);
-  }
-
-  private JPanel middle() {
-    JPanel center = new JPanel();
-    center.add("center", new JLabel(getLogo()));
-    return center;
-  }
-  
-  private JPanel right() {
-    header = new JLabel();
-    header.setFont(new Font("Tahoma", Font.PLAIN, 22));    
-    JPanel east = new JPanel();
-    east.add("center", header);
-    return east;
-  }
-  
-  protected void onNewItem(String item, int count) {  
-    header.setText("Requisição: " + count);  
-  }
-  
-  @Override
-  protected JPanel north() {
-    JPanel north = super.north();   
-    north.setLayout(new BorderLayout(0, 0));
-    north.add(middle(), BorderLayout.CENTER);
-    north.add(right(), BorderLayout.SOUTH);
-    return north;
-  }
-  
-  protected abstract Icon getLogo();
 }
