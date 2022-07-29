@@ -77,15 +77,13 @@ public final class ExceptionAlert extends SimpleFrame {
     new ExceptionAlert(icon, message, detail, cause).display();
   }
   
-  private static final int MIN_WIDTH = 420;
-  
-  private static final int MIN_HEIGHT = 160;
-  
+  private static final Dimension MININUM_SIZE = new Dimension(420, 160);
+      
+  private final JPanel southPane = new JPanel();
+
   private final JTextArea textArea = new JTextArea();
   
   private final JScrollPane centerPane = new JScrollPane();
-  
-  private final JPanel southPane = new JPanel();
   
   private final JLabel seeDetailLabel = new JLabel("<html><u>Ver detalhes</u></html>");
   
@@ -94,7 +92,7 @@ public final class ExceptionAlert extends SimpleFrame {
     setupLayout(message, detail, cause);
     setupListeners();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    setFixedMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
+    setFixedMinimumSize(MININUM_SIZE);
     setAutoRequestFocus(true);
   }
 
@@ -117,7 +115,7 @@ public final class ExceptionAlert extends SimpleFrame {
           seeDetailLabel.setText("<html><u>Ver detalhes</u></html>");
         }
       }
-   });    
+    });    
   }
   
   @Override
