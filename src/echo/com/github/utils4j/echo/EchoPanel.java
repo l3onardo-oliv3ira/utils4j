@@ -97,11 +97,11 @@ public class EchoPanel extends JPanel {
     
   private JPanel south() {
     JPanel southPane = new JPanel();
-    JButton btnLimpar = new JButton("Limpar");
-    btnLimpar.setPreferredSize(close.getPreferredSize());
-    btnLimpar.addActionListener(this::clear);    
+    JButton cleanButton = new JButton("Limpar");
+    cleanButton.setPreferredSize(close.getPreferredSize());
+    cleanButton.addActionListener(this::clear);    
     southPane.setLayout(new MigLayout("fillx", "push[][]", "[][]"));
-    southPane.add(btnLimpar);
+    southPane.add(cleanButton);
     southPane.add(close);
     return southPane;
   }

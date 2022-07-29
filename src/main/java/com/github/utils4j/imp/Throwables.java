@@ -67,6 +67,10 @@ public final class Throwables {
   public static boolean tryRun(IExecutable<?> e, boolean defaultIfFail) {
     return tryRun(e, defaultIfFail, false);
   }
+  
+  public static void tryRun(boolean logQuietly, IExecutable<?> e) {
+    tryRun(e, false, logQuietly);
+  }
 
   public static boolean tryRun(IExecutable<?> e, boolean defaultIfFail, boolean logQuietly) {
     try {
