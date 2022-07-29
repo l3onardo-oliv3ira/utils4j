@@ -82,11 +82,11 @@ public enum ProviderInstaller implements IProviderInstaller {
   }
   
   public static void uninstall(Provider provider) {
-    if (provider == null)
-      return;
-    if (provider instanceof AuthProvider)
-      tryRun(() -> ((AuthProvider)provider).logout());
-    tryRun(() -> Security.removeProvider(provider.getName()));
-    tryRun(() -> provider.clear());
+    if (provider != null) {
+      if (provider instanceof AuthProvider)
+        tryRun(() -> ((AuthProvider)provider).logout());
+      tryRun(() -> Security.removeProvider(provider.getName()));
+      tryRun(() -> provider.clear());
+    }
   }
 }
