@@ -105,7 +105,7 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
     setupPages();
     setResizable(false);
     setSize(300, 150);
-    setLocationRelativeTo(null);
+    toCenter();
     setAutoRequestFocus(true);
     setAlwaysOnTop(true);
   }
@@ -221,7 +221,7 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
 
 
   private void display() {
-    this.setLocationRelativeTo(null);
+    this.toCenter();
     this.setVisible(true);
   }
 }

@@ -1,22 +1,18 @@
-package com.github.utils4j.echo;
+package com.github.utils4j.echo.imp;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
+import com.github.utils4j.echo.IEcho;
 import com.github.utils4j.imp.Args;
 import com.github.utils4j.imp.Strings;
 
-import net.miginfocom.swing.MigLayout;
-
-public class EchoPanel extends JPanel {
+public class EchoPanel extends JPanel implements IEcho {
   
   private static final Dimension DEFAULT_SIZE = new Dimension(500, 680);
 
@@ -26,8 +22,6 @@ public class EchoPanel extends JPanel {
 
   private final String headerItemFormat;
 
-  private final JButton close = new JButton("Fechar");
-  
   private int itemCount = 0;
 
   public EchoPanel() {
@@ -42,14 +36,21 @@ public class EchoPanel extends JPanel {
   protected JPanel north() {
     return new JPanel();
   }  
-  
-  protected void clear(ActionEvent e) {
+
+  @Override
+  public JPanel asPanel() {
+    return this;
+  }
+
+  @Override
+  public final void clear() {
     textArea.setText(Strings.empty()); //auto clean
     itemCount = 0;
     onNewItem(Strings.empty(), itemCount);
   }
 
-  public void addRequest(String request) {
+  @Override
+  public final void addRequest(String request) {
     if (request != null) {
       addItem(request);
     }
@@ -57,7 +58,7 @@ public class EchoPanel extends JPanel {
   
   private void addItem(String item) {
     if (itemCount >= MAX_ITEM_COUNT) {
-      clear(null);      
+      clear();      
     }
     onNewItem(item, ++itemCount);
     textArea.append(String.format(headerItemFormat, itemCount));
@@ -88,21 +89,5 @@ public class EchoPanel extends JPanel {
     setLayout(new BorderLayout(0, 0));
     add(north(), BorderLayout.NORTH);
     add(center(), BorderLayout.CENTER);
-    add(south(), BorderLayout.SOUTH);
-  }
-
-  void addCloseListener(ActionListener listener) {
-    close.addActionListener(listener);  
-  }
-    
-  private JPanel south() {
-    JPanel southPane = new JPanel();
-    JButton cleanButton = new JButton("Limpar");
-    cleanButton.setPreferredSize(close.getPreferredSize());
-    cleanButton.addActionListener(this::clear);    
-    southPane.setLayout(new MigLayout("fillx", "push[][]", "[][]"));
-    southPane.add(cleanButton);
-    southPane.add(close);
-    return southPane;
   }
 }

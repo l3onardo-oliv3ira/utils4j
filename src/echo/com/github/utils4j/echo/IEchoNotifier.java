@@ -26,9 +26,7 @@
 
 package com.github.utils4j.echo;
 
-import java.util.function.Consumer;
-
-public interface IEchoNotifier extends Consumer<String> {
+public interface IEchoNotifier {
   boolean isOpen();
   boolean isVisible();
 

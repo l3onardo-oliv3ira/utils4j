@@ -33,7 +33,7 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public abstract class EchoNotifier implements IEchoNotifier {
 
-  private BehaviorSubject<String> echo;
+  protected BehaviorSubject<String> echo;
 
   @Override
   public final boolean isOpen() {
@@ -50,17 +50,16 @@ public abstract class EchoNotifier implements IEchoNotifier {
   protected final Observable<String> getEcho() {
     return echo;
   }
+  
+  protected final void onNext(String message) {
+    show();
+    echo.onNext(message);
+  }
 
   protected void doOpen() {
     this.echo = BehaviorSubject.create();
   }
   
-  @Override
-  public final void accept(String message) {
-    show();
-    echo.onNext(message);
-  }
-
   @Override
   public final void close() {
     if (isOpen()) {

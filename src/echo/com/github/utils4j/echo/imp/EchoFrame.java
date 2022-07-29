@@ -24,28 +24,34 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.echo;
+package com.github.utils4j.echo.imp;
 
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
+import com.github.utils4j.echo.IEcho;
 import com.github.utils4j.gui.imp.Images;
 import com.github.utils4j.gui.imp.SimpleFrame;
 import com.github.utils4j.imp.Args;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
+import net.miginfocom.swing.MigLayout;
 
 public class EchoFrame extends SimpleFrame {
 
   private static final Dimension MININUM_SIZE = new Dimension(300, 350);
   
-  private final EchoPanel panel;
+  private final IEcho panel;
 
   private final Disposable ticket;
 
@@ -53,7 +59,7 @@ public class EchoFrame extends SimpleFrame {
     this(echoCallback, "Echo", new EchoPanel());
   }
 
-  public EchoFrame(Observable<String> echoCallback, EchoPanel panel) {
+  public EchoFrame(Observable<String> echoCallback, IEcho panel) {
     this(echoCallback, "Echo", panel);
   }
   
@@ -61,7 +67,7 @@ public class EchoFrame extends SimpleFrame {
     this(echoCallback, title, new EchoPanel());
   }
   
-  public EchoFrame(Observable<String> echoCallback, String title, EchoPanel panel) {
+  public EchoFrame(Observable<String> echoCallback, String title, IEcho panel) {
     super(title);
     echoCallback = Args.requireNonNull(echoCallback, "requestCallback is null");
     this.panel = Args.requireNonNull(panel, "panel is null");    
@@ -83,26 +89,39 @@ public class EchoFrame extends SimpleFrame {
   
   private void setup() {
     setupLayout();
+    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     setIconImage(Images.ECHO.asImage());    
     setFixedMinimumSize(MININUM_SIZE);
-    setupLocation();
-  }
-  
-  protected void setupLocation() {
-    setLocationRelativeTo(null);  
-  }
-
-  private void setupLayout() {
-    panel.addCloseListener(this::onEscPressed);
-    setContentPane(panel);
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     pack();
+    toCenter();
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent windowEvent) {        
         onEscPressed(null);
       }
     });
   }
+  
+  private void setupLayout() {
+    JPanel content = new JPanel();
+    content.setLayout(new BorderLayout(0, 0));
+    content.add(panel.asPanel(), BorderLayout.CENTER);
+    content.add(south(), BorderLayout.SOUTH);
+    setContentPane(content);
+  }
+
+  private Component south() {
+    JButton cleanButton = new JButton("Limpar");
+    cleanButton.addActionListener((e) -> panel.clear());
+    JButton closeButton = new JButton("Fechar");
+    closeButton.addActionListener(this::onEscPressed);
+    
+    JPanel southPane = new JPanel();
+    southPane.setLayout(new MigLayout("fillx", "push[][]", "[][]"));
+    southPane.add(cleanButton);
+    southPane.add(closeButton);
+    return southPane;
+  }
+
 
   public static void main(String[] args) {
   }

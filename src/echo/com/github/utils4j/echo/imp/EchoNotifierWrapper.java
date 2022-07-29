@@ -38,11 +38,6 @@ public class EchoNotifierWrapper implements IEchoNotifier {
   }
 
   @Override
-  public void accept(String t) {
-    notifier.accept(t);
-  }
-
-  @Override
   public void open() {
     notifier.open();
   }

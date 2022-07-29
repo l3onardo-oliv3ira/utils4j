@@ -60,4 +60,9 @@ public class SimpleFrame extends JEscFrame {
   protected void setFixedMinimumSize(Dimension dimension) {
     SwingTools.setFixedMinimumSize(this, dimension);
   }
+  
+  protected final void toCenter() {
+    super.setLocationRelativeTo(null);
+  }
+
 }

@@ -90,7 +90,7 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     createSouth();
     setSize(new Dimension(650, 300));
     setFixedMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
-    setLocationRelativeTo(null);
+    toCenter();
     setAutoRequestFocus(true);
     setAlwaysOnTop(true);
     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

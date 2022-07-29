@@ -184,7 +184,7 @@ public final class ExceptionAlert extends SimpleFrame {
   }
 
   private void display() {
-    this.setLocationRelativeTo(null);
+    this.toCenter();
     this.showToFront(); 
   }
 }

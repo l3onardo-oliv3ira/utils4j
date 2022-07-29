@@ -24,13 +24,14 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.echo;
+package com.github.utils4j.echo.imp;
 
 import static com.github.utils4j.imp.Throwables.tryRun;
 
 import java.awt.event.ActionEvent;
 
-import com.github.utils4j.echo.imp.EchoNotifier;
+import com.github.utils4j.echo.IEcho;
+import com.github.utils4j.gui.imp.SimpleFrame;
 import com.github.utils4j.gui.imp.SwingTools;
 import com.github.utils4j.imp.Args;
 
@@ -45,7 +46,7 @@ public class EchoNotifierWindow extends EchoNotifier {
 
   protected final String title;
 
-  protected EchoFrame echoFrame;
+  protected SimpleFrame frame;
 
   public EchoNotifierWindow(String title) {
     this(title, DEFAULT_HEADER_FORMAT);
@@ -59,10 +60,10 @@ public class EchoNotifierWindow extends EchoNotifier {
   @Override
   protected void doOpen() {
     super.doOpen();
-    echoFrame = createFrame();
+    frame = createFrame();
   }
   
-  private final EchoFrame createFrame() {
+  protected SimpleFrame createFrame() {
     return new EchoFrame(getEcho(), title, createPanel()) {
       @Override
       protected void onEscPressed(ActionEvent e) {
@@ -71,23 +72,23 @@ public class EchoNotifierWindow extends EchoNotifier {
     };
   }
   
-  protected EchoPanel createPanel() {
+  protected IEcho createPanel() {
     return new EchoPanel(headerFormat);
   }
   
   @Override
   protected void doClose() {
     super.doClose();
-    tryRun(echoFrame::close);
+    tryRun(frame::close);
   }
 
   @Override
   protected void display() {
-    SwingTools.invokeAndWait(echoFrame::showToFront);
+    SwingTools.invokeAndWait(frame::showToFront);
   }
 
   @Override
   protected boolean isDisplayed() {
-    return echoFrame.isVisible();
+    return frame.isVisible();
   }
 }

@@ -24,7 +24,7 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.echo;
+package com.github.utils4j.echo.imp;
 
 import java.awt.BorderLayout;
 import java.awt.Font;

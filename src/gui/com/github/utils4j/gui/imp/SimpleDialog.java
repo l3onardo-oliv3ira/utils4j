@@ -59,6 +59,10 @@ public class SimpleDialog extends JEscDialog {
   protected void setFixedMinimumSize(Dimension dimension) {
     SwingTools.setFixedMinimumSize(this, dimension);
   }
+  
+  protected final void toCenter() {
+    super.setLocationRelativeTo(null);
+  }
 
   public void showToFront(){
     SwingTools.showToFront(this);
