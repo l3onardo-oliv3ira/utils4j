@@ -33,7 +33,6 @@ public abstract class Ids {
   private Ids() {}
   
   private static final AtomicLong next = new AtomicLong(System.nanoTime());
-  private static long last = -1;
 
   public static String next() {
     return next("");
@@ -43,10 +42,7 @@ public abstract class Ids {
     return next(prefix, "");
   }
 
-  public static synchronized String next(String prefix, String suffix) {
-    long n = next.getAndIncrement();
-    if (last == n)
-      last = ++n;
-    return prefix + Long.toString(last = n) + suffix;
+  public static String next(String prefix, String suffix) {
+    return prefix + Long.toString(next.getAndIncrement()) + suffix;
   }
 }

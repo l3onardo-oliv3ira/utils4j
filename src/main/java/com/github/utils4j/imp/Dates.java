@@ -69,6 +69,10 @@ public class Dates {
     return format("yyyy-MM-dd_HH'h'mm'm'ss's'S'ms'", new Date());
   }
   
+  public static String timeNow() {
+    return format("HH'h'mm'm'ss's'S'ms'", new Date());
+  }
+  
   public static String defaultFormat(Date date) {
     return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", BRAZIL).format(date);
   }

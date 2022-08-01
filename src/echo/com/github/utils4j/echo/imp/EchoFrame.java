@@ -24,6 +24,7 @@
 * SOFTWARE.
 */
 
+
 package com.github.utils4j.echo.imp;
 
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;

@@ -24,6 +24,7 @@
 * SOFTWARE.
 */
 
+
 package com.github.utils4j.echo;
 
 public interface IEchoNotifier {

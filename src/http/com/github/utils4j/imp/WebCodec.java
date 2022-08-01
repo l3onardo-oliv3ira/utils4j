@@ -24,6 +24,7 @@
 * SOFTWARE.
 */
 
+
 package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Throwables.rootMessage;
