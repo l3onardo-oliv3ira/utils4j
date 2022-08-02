@@ -99,6 +99,14 @@ public final class Throwables {
     }
   }
   
+  public static Optional<Exception> tryCatche(IExecutable<?> e) {
+    return tryCatch(e);
+  }
+  
+  public static Optional<Exception> tryCatchp(IProcedure<?, Exception> p) {
+    return tryCatch(p);
+  }
+  
   public static Optional<Exception> tryCatch(IExecutable<?> e) {
     try {
       e.execute();
