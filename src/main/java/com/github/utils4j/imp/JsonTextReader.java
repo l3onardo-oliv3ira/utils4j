@@ -46,7 +46,6 @@ public class JsonTextReader implements ITextReader {
     this.clazz = Args.requireNonNull(clazz, "clazz is null");
     this.charset = Args.requireNonNull(charset, "charset is null");
   }
-
   
   @Override
   @SuppressWarnings("unchecked")

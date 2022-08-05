@@ -28,6 +28,7 @@
 package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Throwables.rootMessage;
+import static com.github.utils4j.imp.Throwables.runQuietly;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,42 +57,54 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
   }
   
   private final CloseableHttpClient client;
+  private final CloseableStats stats;
   
-  public WebCodec(CloseableHttpClient client) {
+  protected WebCodec(CloseableHttpClient client) {
+    this(client, CloseableStats.IDLE);
+  }
+  
+  protected WebCodec(CloseableHttpClient client, CloseableStats stats) {
     this.client = Args.requireNonNull(client, "client is null");
+    this.stats = Args.requireNonNull(stats, "closeable is null");
   }
   
   @Override
-  public void close() throws Exception {
-    client.close();
+  public void close() {
+    runQuietly(client::close);
+    runQuietly(stats::close);
   }
 
   @Override
   public R post(final IProvider<HttpPost> provider, IResultChecker checkResults) throws Exception {
     try {      
       final HttpPost post = provider.get();
-
       try(CloseableHttpResponse response = client.execute(post)) {
-        int code = response.getCode();
-        if (!isSuccess(code)) {
-          throw launch("Servidor retornando - HTTP Code: " + code);
-        }
         HttpEntity entity = response.getEntity();
-        if (entity != null) {
-          String responseText;
-          try {
-            responseText = EntityUtils.toString(entity, IConstants.DEFAULT_CHARSET);
-          } catch (ParseException | IOException e) {
-            throw launch("Falha na leitura de entity - HTTP Code: " + code, e);
-          } finally {
+        try {
+          int code = response.getCode();
+          if (!isSuccess(code)) {
+            throw launch("Servidor retornando - HTTP Code: " + code);
+          }
+          if (entity != null) {
+            String responseText;
+            try {
+              responseText = EntityUtils.toString(entity, IConstants.DEFAULT_CHARSET);
+            } catch (ParseException | IOException e) {
+              throw launch("Falha na leitura de entity - HTTP Code: " + code, e);
+            }
+            checkResults.handle(responseText);
+          }
+          return success();
+        } finally {
+          if (entity != null) {
             EntityUtils.consumeQuietly(entity);
           }
-          checkResults.handle(responseText);
         }
-        return success();
       }
-    }catch(CancellationException e) {
+    } catch(CancellationException e) {
       throw launch("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e));
+    } finally {
+      System.err.println(stats.getTotalStats().toString());
     }
   }
   
@@ -104,29 +117,31 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
       try(CloseableHttpResponse response = client.execute(get)) {
         int code = response.getCode();
 
-        if (!isSuccess(code)) { 
-          throw launch("Servidor retornando - HTTP Code: " + code);
-        }
         HttpEntity entity = response.getEntity();
         if (entity == null) {
           throw launch("Servidor não foi capaz de retornar dados. (entity is null) - HTTP Code: " + code);
         }
         try {
-          final long total = entity.getContentLength();
-          final InputStream input = entity.getContent();
-          
-          status.onStartDownload(total);
-          final byte[] buffer = new byte[128 * 1024];
-          
-          status.onStatus(total, 0);
-          for(int length, written = 0; (length = input.read(buffer)) > 0; status.onStatus(total, written += length))
-            output.write(buffer, 0, length);
-          status.onEndDownload();
+          if (!isSuccess(code)) { 
+            throw launch("Servidor retornando - HTTP Code: " + code);
+          }
+          try {
+            final long total = entity.getContentLength();
+            final InputStream input = entity.getContent();
             
-        } catch(InterruptedException e) {     
-          throw new InterruptedException("Download interrompido - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));
-        } catch(Exception e) {
-          throw launch("Falha durante o download do arquivo - HTTP Code: " + code, e);
+            status.onStartDownload(total);
+            final byte[] buffer = new byte[128 * 1024];
+            
+            status.onStatus(total, 0);
+            for(int length, written = 0; (length = input.read(buffer)) > 0; status.onStatus(total, written += length))
+              output.write(buffer, 0, length);
+            status.onEndDownload();
+              
+          } catch(InterruptedException e) {     
+            throw new InterruptedException("Download interrompido - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));
+          } catch(Exception e) {
+            throw launch("Falha durante o download do arquivo - HTTP Code: " + code, e);
+          }
         } finally {
           EntityUtils.consumeQuietly(entity);
         }
@@ -136,6 +151,8 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
     } catch (Exception e) {
       status.onDownloadFail(e);
       throw e;
+    } finally {
+      System.err.println(stats.getTotalStats().toString());
     }
   }
   
