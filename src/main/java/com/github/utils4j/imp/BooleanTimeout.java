@@ -62,7 +62,7 @@ public class BooleanTimeout {
 
   private final long timeout;
 
-  private Thread rollbackThread;
+  private volatile Thread rollbackThread;
 
   private volatile long lastTime;
 
@@ -112,8 +112,10 @@ public class BooleanTimeout {
   }
   
   public final void shutdown() throws InterruptedException {
-    rollbackThread.interrupt();
-    rollbackThread.join();
+    if (rollbackThread != null) {
+      rollbackThread.interrupt();
+      rollbackThread.join();
+    }
   }
   
   private void roolbackToFalse() {
@@ -124,7 +126,7 @@ public class BooleanTimeout {
           try {
             value.wait();
           } catch (InterruptedException e) {
-            rollbackThread.interrupt();
+            Thread.currentThread().interrupt();
             break out;
           }
         }
@@ -135,7 +137,7 @@ public class BooleanTimeout {
           try {
             value.wait(waitingTime());
           } catch (InterruptedException e) {
-            rollbackThread.interrupt();
+            Thread.currentThread().interrupt();
             break out;
           }
         }
@@ -143,11 +145,11 @@ public class BooleanTimeout {
         
       value.set(false);
 
-    }while(!rollbackThread.isInterrupted());
+    } while(!Thread.currentThread().isInterrupted());
     
-    rollbackThread = null;
-
     value.set(false);
+
+    rollbackThread = null;
   }
   
   public static void main(String[] args) throws Throwable {
