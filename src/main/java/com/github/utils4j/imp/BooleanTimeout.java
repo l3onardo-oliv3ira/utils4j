@@ -53,7 +53,6 @@
 package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Threads.startAsync;
-import static com.github.utils4j.imp.Throwables.runQuietly;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -61,9 +60,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BooleanTimeout {
 
-  private Thread rollbackThread;
-  
   private final long timeout;
+
+  private Thread rollbackThread;
 
   private volatile long lastTime;
 
@@ -112,11 +111,9 @@ public class BooleanTimeout {
     return state;
   }
   
-  public final void shutdown() {
+  public final void shutdown() throws InterruptedException {
     rollbackThread.interrupt();
-    runQuietly(rollbackThread::join);
-    rollbackThread = null;
-    value.set(false); 
+    rollbackThread.join();
   }
   
   private void roolbackToFalse() {
