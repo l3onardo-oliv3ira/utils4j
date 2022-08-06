@@ -65,9 +65,9 @@ public class SwingTools {
   public static boolean invokeAndWait(Runnable code, boolean defaultIfFail) {
     Args.requireNonNull(code, "code is null");    
     IProcedure<Boolean, ?> p = SwingUtilities.isEventDispatchThread() ? 
-        () -> { code.run(); return true; } : 
-          () -> { SwingUtilities.invokeAndWait(code); return true;};
-          return tryCall(p, defaultIfFail);
+      () -> { code.run(); return true; } : 
+      () -> { SwingUtilities.invokeAndWait(code); return true;};
+    return tryCall(p, defaultIfFail);
   }
 
   public static void invokeLater(Runnable code) {

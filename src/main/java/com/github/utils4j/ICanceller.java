@@ -31,5 +31,5 @@ package com.github.utils4j;
 public interface ICanceller {
   ICanceller NOTHING = (r) -> {};
   
-  void cancelCode(Runnable code);
+  void cancelCode(Runnable code) throws InterruptedException;
 }
