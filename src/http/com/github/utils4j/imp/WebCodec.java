@@ -28,7 +28,6 @@
 package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Throwables.rootMessage;
-import static com.github.utils4j.imp.Throwables.runQuietly;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,35 +55,27 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
     return (code >= HttpStatus.SC_SUCCESS && code < HttpStatus.SC_REDIRECTION) || code == HttpStatus.SC_NOT_MODIFIED; 
   }
   
-  private final CloseableHttpClient client;
-  private final CloseableStats stats;
+  protected final CloseableHttpClient client;
   
   protected WebCodec(CloseableHttpClient client) {
-    this(client, CloseableStats.IDLE);
-  }
-  
-  protected WebCodec(CloseableHttpClient client, CloseableStats stats) {
     this.client = Args.requireNonNull(client, "client is null");
-    this.stats = Args.requireNonNull(stats, "closeable is null");
   }
   
-  @Override
-  public void close() {
-    runQuietly(client::close);
-    runQuietly(stats::close);
-  }
-
   @Override
   public R post(final IProvider<HttpPost> provider, IResultChecker checkResults) throws Exception {
     try {      
       final HttpPost post = provider.get();
+      
       try(CloseableHttpResponse response = client.execute(post)) {
+      
         HttpEntity entity = response.getEntity();
         try {
           int code = response.getCode();
+          
           if (!isSuccess(code)) {
             throw launch("Servidor retornando - HTTP Code: " + code);
           }
+          
           if (entity != null) {
             String responseText;
             try {
@@ -94,6 +85,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
             }
             checkResults.handle(responseText);
           }
+
           return success();
         } finally {
           if (entity != null) {
@@ -103,8 +95,6 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
       }
     } catch(CancellationException e) {
       throw launch("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e));
-    } finally {
-      System.err.println(stats.getTotalStats().toString());
     }
   }
   
@@ -112,6 +102,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
   public void get(IProvider<HttpGet> provider, IDownloadStatus status) throws Exception {
     
     try(OutputStream output = status.onNewTry()) {
+      
       final HttpGet get = provider.get();
       
       try(CloseableHttpResponse response = client.execute(get)) {
@@ -121,10 +112,12 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
         if (entity == null) {
           throw launch("Servidor não foi capaz de retornar dados. (entity is null) - HTTP Code: " + code);
         }
+      
         try {
           if (!isSuccess(code)) { 
             throw launch("Servidor retornando - HTTP Code: " + code);
           }
+          
           try {
             final long total = entity.getContentLength();
             final InputStream input = entity.getContent();
@@ -151,8 +144,6 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
     } catch (Exception e) {
       status.onDownloadFail(e);
       throw e;
-    } finally {
-      System.err.println(stats.getTotalStats().toString());
     }
   }
   

@@ -27,7 +27,7 @@
 
 package com.github.utils4j.echo.imp;
 
-import static com.github.utils4j.imp.Throwables.tryRun;
+import static com.github.utils4j.imp.Throwables.runQuietly;
 
 import java.awt.event.ActionEvent;
 
@@ -85,7 +85,7 @@ public class EchoNotifierWindow extends EchoNotifier {
   @Override
   protected void doClose() {
     super.doClose();
-    tryRun(frame::close);
+    runQuietly(frame::close);
   }
 
   @Override

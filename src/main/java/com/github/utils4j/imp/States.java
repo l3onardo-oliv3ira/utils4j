@@ -117,6 +117,12 @@ public class States {
     return value;
   }
 
+  public static boolean requireFalse(boolean value, String message) {
+    if (value)
+      throw new IllegalStateException(message);
+    return value;
+  }
+  
   public static Path requireExists(Path path, String message) {
     return requireExists(path, message, LinkOption.NOFOLLOW_LINKS);
   }

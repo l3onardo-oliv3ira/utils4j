@@ -27,14 +27,17 @@
 
 package com.github.utils4j.imp;
 
-import java.util.AbstractMap;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class Pair<K, V> extends AbstractMap.SimpleEntry<K,V>{
+import com.github.utils4j.IKeyValue;
 
-  private static final long serialVersionUID = 1L;
+public final class Pair<K, V> implements IKeyValue<K,V>{
 
+  private final K key;
+  
+  private final V value;
+  
   public static <K, V> Pair<K, V> of(K key, V value) {
     return new Pair<K, V>(key, value);
   }
@@ -56,7 +59,8 @@ public class Pair<K, V> extends AbstractMap.SimpleEntry<K,V>{
   }
 
   private Pair(K key, V value) {
-    super(key, value);
+    this.key = key;
+    this.value = value;
   }
   
   public Stream<V> valueStream() {
@@ -65,5 +69,15 @@ public class Pair<K, V> extends AbstractMap.SimpleEntry<K,V>{
   
   public Stream<K> keyStream() {
     return Stream.of(getKey());
+  }
+
+  @Override
+  public K getKey() {
+    return key;
+  }
+
+  @Override
+  public V getValue() {
+    return value;
   }
 }

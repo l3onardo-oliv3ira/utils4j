@@ -27,7 +27,7 @@
 
 package com.github.utils4j.imp;
 
-import static com.github.utils4j.imp.Throwables.tryRun;
+import static com.github.utils4j.imp.Throwables.runQuietly;
 import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
 
 import java.io.File;
@@ -104,19 +104,19 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   }
 
   private void cleanFolder() {
-    tryRun(() -> Directory.rmDir(folderWatching, f -> f.isFile() && !f.equals(lockFile)));
+    runQuietly(() -> Directory.rmDir(folderWatching, f -> f.isFile() && !f.equals(lockFile)));
   }
 
   private void closeService() {
     if (watchService != null) {
-      tryRun(watchService::close);
+      runQuietly(watchService::close);
       watchService = null;
     }
   }
   
   private void releaseLock() {
     if (lock != null) {
-      tryRun(lock::close);
+      runQuietly(lock::close);
       lockFile.delete();
       lock = null;
     }

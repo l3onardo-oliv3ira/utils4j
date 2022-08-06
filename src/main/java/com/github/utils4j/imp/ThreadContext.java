@@ -27,7 +27,7 @@
 
 package com.github.utils4j.imp;
 
-import static com.github.utils4j.imp.Throwables.tryRun;
+import static com.github.utils4j.imp.Throwables.runQuietly;
 
 import com.github.utils4j.ILifeCycle;
 
@@ -73,9 +73,9 @@ public abstract class ThreadContext<E extends Exception> implements ILifeCycle<E
         } catch(InterruptedException e) {
           interrupt();
         } catch (Exception e) {
-          tryRun(() -> ThreadContext.this.handleException(e));
+          runQuietly(() -> ThreadContext.this.handleException(e));
         } finally {
-          tryRun(ThreadContext.this::afterRun);
+          runQuietly(ThreadContext.this::afterRun);
           context = null;
         }
       }

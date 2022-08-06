@@ -27,7 +27,7 @@
 
 package com.github.utils4j.imp;
 
-import static com.github.utils4j.imp.Throwables.tryRun;
+import static com.github.utils4j.imp.Throwables.runQuietly;
 import static org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
 
 import java.security.AuthProvider;
@@ -84,9 +84,9 @@ public enum ProviderInstaller implements IProviderInstaller {
   public static void uninstall(Provider provider) {
     if (provider != null) {
       if (provider instanceof AuthProvider)
-        tryRun(() -> ((AuthProvider)provider).logout());
-      tryRun(() -> Security.removeProvider(provider.getName()));
-      tryRun(() -> provider.clear());
+        runQuietly(() -> ((AuthProvider)provider).logout());
+      runQuietly(() -> Security.removeProvider(provider.getName()));
+      runQuietly(() -> provider.clear());
     }
   }
 }

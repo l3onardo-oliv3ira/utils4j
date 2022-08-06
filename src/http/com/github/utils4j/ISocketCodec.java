@@ -27,5 +27,5 @@
 
 package com.github.utils4j;
 
-public interface ISocketCodec<T, R> extends IPostCodec<T, R>, IGetCodec, AutoCloseable{
+public interface ISocketCodec<T, R> extends IPostCodec<T, R>, IGetCodec {
 }

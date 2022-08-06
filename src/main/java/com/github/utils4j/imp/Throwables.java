@@ -69,7 +69,11 @@ public final class Throwables {
   }
   
   public static void runQuietly(IExecutable<?> e) {
-    tryRun(e, false, true);
+    runQuietly(e, true);
+  }
+
+  public static void runQuietly(IExecutable<?> e, boolean logQuietly) {
+    tryRun(e, false, logQuietly);
   }
 
   public static void tryRun(boolean logQuietly, IExecutable<?> e) {

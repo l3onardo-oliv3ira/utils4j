@@ -27,7 +27,7 @@
 
 package com.github.utils4j.imp;
 
-import static com.github.utils4j.imp.Throwables.tryRun;
+import static com.github.utils4j.imp.Throwables.runQuietly;
 
 public class Threads {
   private Threads(){}
@@ -100,7 +100,7 @@ public class Threads {
 
   public static void shutdownHookRem(ShutdownHookThread jvmHook) {
     if (!isShutdownHook()) {
-      tryRun(() -> Runtime.getRuntime().removeShutdownHook(jvmHook), true);
+      runQuietly(() -> Runtime.getRuntime().removeShutdownHook(jvmHook), true);
     }
   }
   
