@@ -126,7 +126,6 @@ public class BooleanTimeout {
       }
       
       while(!hasTimeout()) {
-        System.out.println("ENCONTREI UM TRUE");
         synchronized(value) {
           try {
             value.wait(waitingTime());
@@ -137,7 +136,6 @@ public class BooleanTimeout {
         }
       }
         
-      System.out.println("SETEI PRA FALSO");
       value.set(false);
 
     } while(!Thread.currentThread().isInterrupted());
