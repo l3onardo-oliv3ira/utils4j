@@ -62,19 +62,36 @@ public class Threads {
     } while (done < millis);
   }
 
+  
   public static Thread startAsync(Runnable runnable) {
     return startAsync(runnable, 0);
   }
   
-  public static Thread startAsync(Runnable runnable, long delay) {
-    return startAsync(Strings.empty(), runnable, delay);
-  }
-  
-  public static Thread startAsync(String threadName, Runnable runnable) { 
+  public static Thread startAsync(String threadName, Runnable runnable) {
     return startAsync(threadName, runnable, 0);
   }
-
+  
   public static Thread startAsync(String threadName, Runnable runnable, long delay) {
+    return startThread(threadName, runnable, delay, false);
+  }
+
+  public static Thread startAsync(Runnable runnable, long delay) {
+    return startThread(Strings.empty(), runnable, delay, false);
+  }
+  
+  public static Thread startDaemon(Runnable runnable) {
+    return startDaemon(Strings.empty(), runnable);
+  }
+  
+  public static Thread startDaemon(String threadName, Runnable runnable) { 
+    return startDaemon(threadName, runnable, 0);
+  }
+
+  public static Thread startDaemon(String threadName, Runnable runnable, long delay) { 
+    return startThread(threadName, runnable, delay, true);
+  }
+
+  private static Thread startThread(String threadName, Runnable runnable, long delay, boolean deamon) {
     Args.requireNonNull(threadName, "threadName is empty");
     Args.requireNonNull(runnable, "runnable is null");
     Args.requireZeroPositive(delay, "delay is negative");
@@ -82,6 +99,7 @@ public class Threads {
       Threads.sleep(delay);
       runnable.run();
     }, threadName + " from parent: " + Thread.currentThread().getName());
+    t.setDaemon(deamon);
     t.start();
     return t;
   }

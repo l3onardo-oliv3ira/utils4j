@@ -52,7 +52,7 @@
 
 package com.github.utils4j.imp;
 
-import static com.github.utils4j.imp.Threads.startAsync;
+import static com.github.utils4j.imp.Threads.startDaemon;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -90,7 +90,7 @@ public class BooleanTimeout {
 
   private void start() {
     if (rollbackThread == null) {
-      rollbackThread = startAsync("rollback boolean to false timeout", this::roolbackToFalse);
+      rollbackThread = startDaemon("rollback boolean to false timeout", this::roolbackToFalse);
     }
   }
 
@@ -111,13 +111,6 @@ public class BooleanTimeout {
     return state;
   }
   
-  public final void shutdown() throws InterruptedException {
-    if (rollbackThread != null) {
-      rollbackThread.interrupt();
-      rollbackThread.join();
-    }
-  }
-  
   private void roolbackToFalse() {
     out:
     do {
@@ -133,6 +126,7 @@ public class BooleanTimeout {
       }
       
       while(!hasTimeout()) {
+        System.out.println("ENCONTREI UM TRUE");
         synchronized(value) {
           try {
             value.wait(waitingTime());
@@ -143,13 +137,10 @@ public class BooleanTimeout {
         }
       }
         
+      System.out.println("SETEI PRA FALSO");
       value.set(false);
 
     } while(!Thread.currentThread().isInterrupted());
-    
-    value.set(false);
-
-    rollbackThread = null;
   }
   
   public static void main(String[] args) throws Throwable {
@@ -159,7 +150,6 @@ public class BooleanTimeout {
     String line;
     while((line = console.readLine()) != null) {
       if ("fim".equals(line)) {
-        discarting.shutdown();
         break;
       }
       discarting.setTrue();
