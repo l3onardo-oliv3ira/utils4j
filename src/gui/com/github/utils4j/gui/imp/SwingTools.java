@@ -83,6 +83,10 @@ public class SwingTools {
     return invokeAndWait(() -> provider.get().orElse(null));
   }
 
+  public static <T> T invokeAndWaitValue(IProvider<T> provider){
+    return invokeAndWait(provider).get();
+  }
+  
   public static <T> Optional<T> invokeAndWait(IProvider<T> provider){
     Args.requireNonNull(provider, "provider is null");
     IProcedure<Optional<T>, ?> p = SwingUtilities.isEventDispatchThread() ? 
