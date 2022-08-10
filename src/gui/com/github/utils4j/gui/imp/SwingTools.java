@@ -83,20 +83,20 @@ public class SwingTools {
     return invokeAndWait(() -> provider.get().orElse(null));
   }
 
-  public static <T> T invokeAndWaitValue(IProvider<T> provider){
-    return invokeAndWait(provider).get();
+  public static <T> T invokeAndWaitValue(IProvider<T> provider, T defaultFail){
+    return invokeAndWait(provider).orElse(defaultFail);
   }
   
   public static <T> Optional<T> invokeAndWait(IProvider<T> provider){
     Args.requireNonNull(provider, "provider is null");
     IProcedure<Optional<T>, ?> p = SwingUtilities.isEventDispatchThread() ? 
-        () -> ofNullable(provider.get()) : 
-          () -> {
-            final AtomicReference<T> ref = new AtomicReference<>();
-            SwingUtilities.invokeAndWait(() -> tryRuntime(() -> ref.set(provider.get())));
-            return ofNullable(ref.get());
-          };
-          return tryCall(p, empty());
+      () -> ofNullable(provider.get()) : 
+      () -> {
+        AtomicReference<T> ref = new AtomicReference<>();
+        SwingUtilities.invokeAndWait(() -> tryRuntime(() -> ref.set(provider.get())));
+        return ofNullable(ref.get());
+      };
+    return tryCall(p, empty());
   }
 
   public static void setFixedMinimumSize(Window window, Dimension dimension) {

@@ -120,7 +120,7 @@ public final class Throwables {
     }
   }
   
-  public static void tryCatch(IExecutable<?> e, Consumer<Exception> catchBlock) {
+  public static void tryCatche(IExecutable<?> e, Consumer<Exception> catchBlock) {
     try {
       e.execute();
     }catch(Exception ex) {

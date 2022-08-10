@@ -58,6 +58,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Um BooleanTimeout é um objeto que após ganhar o valor TRUE, voltará automaticamente a ter um valor FALSE
+ * após um período de timeout desde a última vez que foi consultado (isTrue)
+ * @author Leonardo
+ *
+ */
 public class BooleanTimeout {
 
   private final long timeout;
@@ -109,6 +115,13 @@ public class BooleanTimeout {
       start();
     }
     return state;
+  }
+  
+  public void shutdown() {
+    if (rollbackThread != null) {
+      rollbackThread.interrupt();
+      rollbackThread = null;
+    }
   }
   
   private void roolbackToFalse() {
