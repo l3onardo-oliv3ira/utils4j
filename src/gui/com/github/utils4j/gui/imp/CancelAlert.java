@@ -37,7 +37,7 @@ import javax.swing.JOptionPane;
 
 public final class CancelAlert {
 
-  public static String CANCELED_OPERATION_MESSAGE = "Operação em cancelada!";
+  public static String CANCELED_OPERATION_MESSAGE = "Operação cancelada!";
 
   public static String CANCELING_OPERATION_MESSAGE = "Operação em cancelamento! Aguarde...";
   

@@ -87,6 +87,10 @@ public class Threads {
     return startDaemon(threadName, runnable, 0);
   }
 
+  public static Thread startDaemon(Runnable runnable, long delay) {
+    return startDaemon(Strings.empty(), runnable, delay);
+  } 
+
   public static Thread startDaemon(String threadName, Runnable runnable, long delay) { 
     return startThread(threadName, runnable, delay, true);
   }
