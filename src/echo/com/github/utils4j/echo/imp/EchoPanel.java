@@ -27,6 +27,8 @@
 
 package com.github.utils4j.echo.imp;
 
+import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
@@ -71,15 +73,17 @@ public class EchoPanel extends JPanel implements IEcho {
 
   @Override
   public final void clear() {
-    textArea.setText(Strings.empty()); //auto clean
-    itemCount = 0;
-    onNewItem(Strings.empty(), itemCount);
+    invokeLater(() -> {
+      textArea.setText(Strings.empty()); //auto clean
+      itemCount = 0;
+      onNewItem(Strings.empty(), itemCount);
+    });
   }
 
   @Override
   public final void addRequest(String request) {
     if (request != null) {
-      addItem(request);
+      invokeLater(() -> addItem(request));
     }
   }
   
