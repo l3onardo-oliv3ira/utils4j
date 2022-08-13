@@ -41,7 +41,7 @@ public final class CancelAlert {
 
   public static String CANCELING_OPERATION_MESSAGE = "Operação em cancelamento! Aguarde...";
   
-  private static final AtomicBoolean visible = new AtomicBoolean(false);
+  private static final AtomicBoolean VISIBLE = new AtomicBoolean(false);
   
   public static void show() {
     show(null);
@@ -76,7 +76,7 @@ public final class CancelAlert {
   }
   
   private static boolean display(String message, Image icon) {
-    if (!visible.getAndSet(true)) {
+    if (!VISIBLE.getAndSet(true)) {
       return new CancelAlert(message).reveal(icon);
     }
     return false;
@@ -104,7 +104,7 @@ public final class CancelAlert {
     dialog.setIconImage(icon);
     dialog.setVisible(true);
     dialog.dispose();
-    visible.set(false);
+    VISIBLE.set(false);
     Object selectedValue = jop.getValue();
     return OPTIONS[0].equals(selectedValue);
   }

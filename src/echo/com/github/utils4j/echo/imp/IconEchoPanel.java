@@ -48,13 +48,13 @@ public abstract class IconEchoPanel extends EchoPanel {
     super(headerItemFormat);
   }
 
-  private JPanel middle() {
-    JPanel center = new JPanel();
-    center.add("center", new JLabel(getIcon()));
-    return center;
+  private JPanel westIcon() {
+    JPanel middle = new JPanel();
+    middle.add("center", new JLabel(getIcon()));
+    return middle;
   }  
 
-  private JPanel right() {
+  private JPanel eastText() {
     header = new JLabel();
     header.setFont(new Font("Tahoma", Font.PLAIN, 22));    
     JPanel east = new JPanel();
@@ -70,8 +70,8 @@ public abstract class IconEchoPanel extends EchoPanel {
   protected JPanel north() {
     JPanel north = super.north();   
     north.setLayout(new BorderLayout(0, 0));
-    north.add(middle(), BorderLayout.CENTER);
-    north.add(right(), BorderLayout.SOUTH);
+    north.add(westIcon(), BorderLayout.WEST);
+    north.add(eastText(), BorderLayout.CENTER);
     return north;
   }
   

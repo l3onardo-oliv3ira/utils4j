@@ -102,8 +102,12 @@ public class EchoPanel extends JPanel implements IEcho {
   }
 
   private void setup() {
-    setBounds(getBounds().x, getBounds().y, DEFAULT_SIZE.width, DEFAULT_SIZE.height);
     setupLayout();
+    setupFrame();
+  }
+
+  private void setupFrame() {
+    setBounds(getBounds().x, getBounds().y, DEFAULT_SIZE.width, DEFAULT_SIZE.height);
   }
   
   private JScrollPane center() {
