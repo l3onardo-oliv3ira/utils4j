@@ -45,7 +45,7 @@ public class EchoPanel extends JPanel implements IEcho {
   
   private static final Dimension DEFAULT_SIZE = new Dimension(500, 680);
 
-  private static final int MAX_ITEM_COUNT = 800;
+  private static final int MAX_ITEM_COUNT = 20;
   
   private final JTextArea textArea = new JTextArea();
 
@@ -73,9 +73,13 @@ public class EchoPanel extends JPanel implements IEcho {
 
   @Override
   public final void clear() {
+    clean(0);
+  }
+
+  private void clean(int start) {
     invokeLater(() -> {
       textArea.setText(Strings.empty()); //auto clean
-      itemCount = 0;
+      itemCount = start;
       onNewItem(Strings.empty(), itemCount);
     });
   }
@@ -89,12 +93,11 @@ public class EchoPanel extends JPanel implements IEcho {
   
   private void addItem(String item) {
     if (itemCount >= MAX_ITEM_COUNT) {
-      clear();      
+      clean(itemCount);      
     }
     onNewItem(item, ++itemCount);
     textArea.append(String.format(headerItemFormat, itemCount));
     textArea.append(item + "\n\r\n\r");
-    textArea.getCaret().setDot(Integer.MAX_VALUE);
   }
   
   protected void onNewItem(String item, int count) {  
