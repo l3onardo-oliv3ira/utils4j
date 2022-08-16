@@ -61,6 +61,12 @@ public abstract class Directory {
     return input;
   }
 
+  public static Path requireExists(Path input, String message) throws IOException {
+    Args.requireNonNull(input, "input is null");
+    requireExists(input.toFile(), message);
+    return input;
+  }
+  
   public static File requireExists(File input, String message) throws IOException {
     Args.requireNonNull(input, "input is null");
     if (!input.exists())
@@ -114,6 +120,11 @@ public abstract class Directory {
       throw new IOException("Unabled to create directory tree  " + folder);
     }
   }  
+  
+  public static void rmCopy(Path source, Path dest) throws IOException {
+    Directory.rmDir(dest);
+    Directory.copyFolder(source, dest);
+  }
 
   public static void copyFolder(Path src, Path dest) throws IOException {
     Args.requireNonNull(src, "src is null");
