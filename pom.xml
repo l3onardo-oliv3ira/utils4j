@@ -6,7 +6,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>com.github</groupId>
    <artifactId>utils4j</artifactId>
-   <version>SNAPSHOT-2.2.0</version>
+   <version>SNAPSHOT-2.2.1</version>
    <name>utils4j</name>
    <!-- powered by -->
    <url>http://github.com/l3onardo-oliveira</url>
