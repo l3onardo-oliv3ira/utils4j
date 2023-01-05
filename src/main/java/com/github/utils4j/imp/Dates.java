@@ -79,6 +79,5 @@ public class Dates {
 
   public static String format(String format, Date date) {
     return new SimpleDateFormat(format, BRAZIL).format(date);
-  }
-  
+  }  
 }

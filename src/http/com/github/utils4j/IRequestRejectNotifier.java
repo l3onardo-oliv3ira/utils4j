@@ -24,19 +24,12 @@
 * SOFTWARE.
 */
 
-
 package com.github.utils4j;
 
-import java.io.IOException;
+import com.sun.net.httpserver.HttpExchange;
 
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
-
-import io.reactivex.Observable;
-
-public interface IDownloader {
-  Observable<HttpUriRequest> newRequest();
+@SuppressWarnings("restriction")
+public interface IRequestRejectNotifier {
   
-  String match(String uri);
-
-  void download(String url, IDownloadStatus status) throws IOException, InterruptedException;
+  void notifyReject(HttpExchange request, String cause);
 }

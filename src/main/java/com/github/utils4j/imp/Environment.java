@@ -120,15 +120,15 @@ public final class Environment {
         return Optional.empty();
       return Optional.ofNullable(defauValueIfEmpty.get());
     }
-    String value = System.getenv(environmentVariableKey);
-    if (value == null) {
-      value = System.getProperty(environmentVariableKey);
-    }
+    String value = System.getProperty(environmentVariableKey);
     if (value == null) {
       value = System.getProperty(environmentVariableKey.toLowerCase());
     }
     if (value == null) {
       value = System.getProperty(environmentVariableKey.toUpperCase());
+    }
+    if (value == null) {
+      value = System.getenv(environmentVariableKey);
     }
     if (value == null) {
       value = System.getenv(environmentVariableKey.toLowerCase());

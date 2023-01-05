@@ -24,19 +24,17 @@
 * SOFTWARE.
 */
 
+package com.github.utils4j.imp;
 
-package com.github.utils4j;
+import com.github.utils4j.IRequestRejectNotifier;
+import com.sun.net.httpserver.Filter;
 
-import java.io.IOException;
+@SuppressWarnings("restriction")
+public abstract class RejectableFilter extends Filter {  //Filter deveria ser uma interface ao invés de uma classe abstrata (bad project)!
 
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
-
-import io.reactivex.Observable;
-
-public interface IDownloader {
-  Observable<HttpUriRequest> newRequest();
+  protected final IRequestRejectNotifier notifier;  
   
-  String match(String uri);
-
-  void download(String url, IDownloadStatus status) throws IOException, InterruptedException;
-}
+  public RejectableFilter(IRequestRejectNotifier notifier) {
+    this.notifier = Args.requireNonNull(notifier, "notifier is null");
+  }
+}  

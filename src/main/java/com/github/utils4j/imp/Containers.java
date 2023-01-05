@@ -33,10 +33,12 @@ import static java.util.Collections.unmodifiableList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,10 @@ public class Containers {
 
   public static boolean isEmpty(Collection<?> c) {
     return c == null || c.size() == 0;
+  }
+  
+  public static <T, C extends Collection<T>> void ifNotEmpty(C c, Consumer<C> consumer) {
+    if (!isEmpty(c)) consumer.accept(c);
   }
 
   public static boolean isEmpty(Map<?, ?> m) {
@@ -102,5 +108,9 @@ public class Containers {
     if (container == null)
       return null;
     return container.toArray(new String[container.size()]);
+  }
+  
+  public static <T> List<T> nonNull(List<T> list) {
+    return list == null ? Collections.emptyList() : list;
   }
 }

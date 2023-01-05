@@ -25,18 +25,14 @@
 */
 
 
-package com.github.utils4j;
+package com.github.utils4j.imp;
 
-import java.io.IOException;
-
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
-
-import io.reactivex.Observable;
-
-public interface IDownloader {
-  Observable<HttpUriRequest> newRequest();
-  
-  String match(String uri);
-
-  void download(String url, IDownloadStatus status) throws IOException, InterruptedException;
+public interface IHttpVerbs {
+  String GET     = "GET";
+  String HEAD    = "HEAD";
+  String PUT     = "PUT";
+  String PATCH   = "PATCH";
+  String DELETE  = "DELETE";
+  String POST    = "POST";
+  String OPTIONS = "OPTIONS";
 }

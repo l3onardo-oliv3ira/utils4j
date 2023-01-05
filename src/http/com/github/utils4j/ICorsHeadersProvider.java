@@ -27,16 +27,12 @@
 
 package com.github.utils4j;
 
-import java.io.IOException;
+import java.util.Optional;
 
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
-
-import io.reactivex.Observable;
-
-public interface IDownloader {
-  Observable<HttpUriRequest> newRequest();
-  
-  String match(String uri);
-
-  void download(String url, IDownloadStatus status) throws IOException, InterruptedException;
+public interface ICorsHeadersProvider {
+  Optional<String> getAccessControlMaxAgeHeader();
+  Optional<String> getAccessControlAllowMethods();
+  Optional<String> getAccessControlAllowHeaders();
+  Optional<String> getAccessControlAllowCredentials();
+  Optional<String> getAccessControlAllowPrivateNetwork();
 }

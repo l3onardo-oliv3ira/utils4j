@@ -58,6 +58,10 @@ public final class Strings {
 
   public static final Comparator<String> LATIN_COMPARATOR = new LatinComparator();
 
+  private static final Optional<String> TRUE = Optional.of("true");
+  
+  private static final Optional<String> FALSE = Optional.of("false");
+  
   private static class LatinComparator implements Comparator<String> {
     @Override
     public int compare(String o1, String o2) {
@@ -74,6 +78,14 @@ public final class Strings {
     }catch (Exception e){
       return Optional.ofNullable(defaultIfFail);
     }
+  }
+  
+  public static Optional<String> trueOptional() {
+    return TRUE;
+  }
+  
+  public static Optional<String> falseOptional() {
+    return FALSE;
   }
   
   public static Optional<String> optional(String text) {

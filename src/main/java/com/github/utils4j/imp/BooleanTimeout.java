@@ -53,9 +53,8 @@
 package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Threads.startDaemon;
+import static com.github.utils4j.imp.Throwables.runQuietly;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -71,12 +70,19 @@ public class BooleanTimeout {
   private volatile Thread rollbackThread;
 
   private volatile long lastTime;
+  
+  private final Runnable timeoutCode;
 
   private final AtomicBoolean value = new AtomicBoolean(false);
 
   public BooleanTimeout(long timeout) {
-    this.timeout = timeout;
+    this(timeout, () -> {});
   }
+
+  public BooleanTimeout(long timeout, Runnable timeoutCode) {
+    this.timeout = Args.requireZeroPositive(timeout, "timeout is negative");
+    this.timeoutCode = Args.requireNonNull(timeoutCode, "timeoutCode is null");
+  }  
   
   private void reset() {
     lastTime = System.currentTimeMillis();
@@ -150,21 +156,8 @@ public class BooleanTimeout {
       }
         
       value.set(false);
+      runQuietly(timeoutCode::run);      
 
     } while(!Thread.currentThread().isInterrupted());
-  }
-  
-  public static void main(String[] args) throws Throwable {
-    BooleanTimeout discarting = new BooleanTimeout(5000);
-    
-    BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-    String line;
-    while((line = console.readLine()) != null) {
-      if ("fim".equals(line)) {
-        break;
-      }
-      discarting.setTrue();
-    }
-    System.out.println("FIM DO PROGRAMA");
   }
 }

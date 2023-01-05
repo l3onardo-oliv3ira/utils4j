@@ -29,10 +29,13 @@ package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Throwables.rootMessage;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.concurrent.CancellationException;
+import java.util.stream.Collectors;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -51,7 +54,7 @@ import com.github.utils4j.imp.function.IProvider;
 
 public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
 
-  private static boolean isSuccess(int code) {
+  protected boolean isSuccess(int code) {
     return (code >= HttpStatus.SC_SUCCESS && code < HttpStatus.SC_REDIRECTION) || code == HttpStatus.SC_NOT_MODIFIED; 
   }
   
@@ -68,36 +71,42 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
       
       try(CloseableHttpResponse response = client.execute(post)) {
       
+        final int code = response.getCode();
+
+        String responseText = Strings.empty();
+
         HttpEntity entity = response.getEntity();
-        try {
-          int code = response.getCode();
-          
-          if (!isSuccess(code)) {
-            throw launch("Servidor retornando - HTTP Code: " + code);
-          }
-          
-          if (entity != null) {
-            String responseText;
-            try {
-              responseText = EntityUtils.toString(entity, IConstants.DEFAULT_CHARSET);
-            } catch (ParseException | IOException e) {
-              throw launch("Falha na leitura de entity - HTTP Code: " + code, e);
-            }
-            checkResults.handle(responseText);
+        
+        if (entity != null) {
+          try {
+            responseText = EntityUtils.toString(entity, IConstants.DEFAULT_CHARSET); //can return null
+          } catch (ParseException | IOException e) {
+            throw launch("Falha na leitura de entity - HTTP Code: " + code, e);
+          } finally {
+            EntityUtils.consumeQuietly(entity);  
           }
 
-          return success();
-        } finally {
-          if (entity != null) {
-            EntityUtils.consumeQuietly(entity);
+          if (responseText == null) {
+            responseText = Strings.empty();
+          }
+          
+          if (isSuccess(code)) {
+            checkResults.handle(responseText);
           }
         }
+        
+        if (!isSuccess(code)) {
+          throw launch("Servidor retornando - HTTP Code: " + code + " Content: \n" + responseText);
+        }
+        
+        return success();
       }
+
     } catch(CancellationException e) {
       throw launch("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e));
     }
   }
-  
+ 
   @Override
   public void get(IProvider<HttpGet> provider, IDownloadStatus status) throws Exception {
     
@@ -144,6 +153,45 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
     } catch (Exception e) {
       status.onDownloadFail(e);
       throw e;
+    }
+  }
+  
+  @Override
+  public String get(IProvider<HttpGet> provider) throws Exception {
+    final HttpGet get = provider.get();
+    
+    try(CloseableHttpResponse response = client.execute(get)) {
+      int code = response.getCode();
+
+      HttpEntity entity = response.getEntity();
+      if (entity == null) {
+        throw launch("Servidor não foi capaz de retornar dados. (entity is null) - HTTP Code: " + code);
+      }
+    
+      try {
+        if (!isSuccess(code)) { 
+          throw launch("Servidor retornando - HTTP Code: " + code);
+        }
+        
+        InputStream input = entity.getContent();
+        
+        if (input == null) {
+          return Strings.empty();
+        }
+
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(input, IConstants.UTF_8))) {
+          return br.lines().collect(Collectors.joining("\n"));
+        }
+        
+      } catch(InterruptedException e) {     
+        throw new InterruptedException("Requisição GET interrompida - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));
+      } catch(Exception e) {
+        throw launch("Falha durante o requisição GET - HTTP Code: " + code, e);
+      } finally {
+        EntityUtils.consumeQuietly(entity);
+      }
+    } finally {
+      get.clear();
     }
   }
   

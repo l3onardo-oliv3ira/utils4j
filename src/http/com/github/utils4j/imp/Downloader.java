@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.HttpHeaders;
 
 import com.github.utils4j.IDownloadStatus;
 import com.github.utils4j.IDownloader;
@@ -65,21 +66,34 @@ public class Downloader implements IDownloader {
   }
   
   @Override
-  public final void download(String uri, IDownloadStatus status) throws IOException {
+  public final void download(String uri, IDownloadStatus status) throws IOException, InterruptedException {
     Args.requireNonNull(uri, "uri is null");
     Args.requireNonNull(status, "status is null");
     final String fullUrl = match(uri);
     try {
       codec.get(() -> createRequest(fullUrl), status);
-    } catch (IOException e) {
+    } catch (InterruptedException e) {
       throw e;
-    } catch (Throwable e) {
+    } catch (IOException e) {
+      checkInterrupt(e);
+      throw e;
+    } catch (Exception e) {
+      checkInterrupt(e);
       throw new IOException("Unabled to download from url: " + fullUrl, e);
     }
   }
   
+  protected static void checkInterrupt(Exception e) throws InterruptedException {
+    if (Thread.currentThread().isInterrupted() || "Request aborted".equals(e.getMessage())) {
+      throw new InterruptedException("Download cancelado! \n\tcause: " + Throwables.rootMessage(e));
+    } 
+  }
+  
   private HttpGet createRequest(String fullUrl) throws URISyntaxException {
     HttpGet r = new HttpGet(fullUrl);
+    //this is very important (akamai blocking if not set header ACCEPT_ENCODING)
+    r.setHeader(HttpHeaders.ACCEPT_ENCODING, "gzip,deflate");
+    r.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
     status.onNext(r);
     return r;
   }

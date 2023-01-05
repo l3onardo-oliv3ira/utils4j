@@ -43,6 +43,12 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" output="target/classes" path="src/network">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry excluding="**" kind="src" output="target/classes" path="resources">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -65,6 +71,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JAVAFX"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

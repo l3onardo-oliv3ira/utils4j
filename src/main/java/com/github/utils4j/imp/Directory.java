@@ -27,17 +27,24 @@
 
 package com.github.utils4j.imp;
 
+import static com.github.utils4j.imp.Throwables.runQuietly;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public abstract class Directory {
   private Directory() {}
+
+  public static void deleteQuietly(File file) {
+    runQuietly(() -> delete(file));
+  }
 
   public static void rmDir(Path path) throws IOException {
     rmDir(path, f -> true);
@@ -46,6 +53,16 @@ public abstract class Directory {
   public static void mkDir(Path path) throws IOException {
     Args.requireNonNull(path, "path is null");
     mkDir(path.toFile());
+  }
+  
+  public static void rmkDir(Path unzipPath) throws IOException {
+    Directory.rmDir(unzipPath);
+    Directory.mkDir(unzipPath);   
+  }
+  
+  public static void rmkDir(File path) throws IOException {
+    Args.requireNonNull(path, "path is null");
+    rmkDir(path.toPath());
   }
 
   public static void requireDirectory(File dir, String message) throws IOException {
@@ -59,6 +76,14 @@ public abstract class Directory {
     if (input.exists()) 
       throw new IOException(message);
     return input;
+  }
+
+  public static void delete(File file) throws IOException {
+    Args.requireNonNull(file, "file is null");
+    if (file.isFile())
+      file.delete();
+    else
+      rmDir(file.toPath());
   }
 
   public static Path requireExists(Path input, String message) throws IOException {
@@ -84,6 +109,12 @@ public abstract class Directory {
         .filter(predicate)
         .forEach(File::delete);
       }
+    }
+  }
+  
+  public static void ifExists(File file, Consumer<File> consumer) {
+    if (file != null && file.exists()) {
+      consumer.accept(file);
     }
   }
 
@@ -133,6 +164,23 @@ public abstract class Directory {
       stream.forEach(source -> copy(source, dest.resolve(src.relativize(source))));
     }catch(RuntimeException e) {
       throw new IOException(e);
+    }
+  }
+  
+  public static String stringPath(File path) {
+    if (path == null)
+      return Strings.empty();
+    return stringPath(path.toPath());
+  }
+
+  public static String stringPath(Path path) {
+    if (path == null)
+      return Strings.empty();
+    File f = path.toFile();
+    try {
+      return f.getCanonicalPath();
+    }catch(IOException e) {
+      return f.getAbsolutePath();
     }
   }
 

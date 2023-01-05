@@ -25,18 +25,27 @@
 */
 
 
-package com.github.utils4j;
+package com.github.utils4j.gui.imp;
 
-import java.io.IOException;
-
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
-
-import io.reactivex.Observable;
-
-public interface IDownloader {
-  Observable<HttpUriRequest> newRequest();
+public abstract class Silencer {
   
-  String match(String uri);
+  private Silencer() {}
+  
+  public static void failAs(boolean silent, String message, Exception e) {
+    failAs(silent, message, e, "");
+  }
 
-  void download(String url, IDownloadStatus status) throws IOException, InterruptedException;
+  public static void failAs(boolean silent, String message, Exception e, String detail) {
+    runAs(silent, () -> ExceptionAlert.show(message, detail, e));
+  }
+  
+  public static void infoAs(boolean silent, String message) {
+    runAs(silent, () -> MessageAlert.showInfo(message));
+  }
+
+  public static void runAs(boolean silent, Runnable r) {
+    if (!silent && r != null) {
+      r.run();
+    }
+  }
 }

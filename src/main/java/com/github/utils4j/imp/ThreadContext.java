@@ -29,11 +29,13 @@ package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Throwables.runQuietly;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.github.utils4j.ILifeCycle;
 
 public abstract class ThreadContext<E extends Exception> implements ILifeCycle<E> {
 
-  private volatile Thread context;
+  private final AtomicReference<Thread> context = new AtomicReference<>();
   private final String name;
   private final boolean deamon;
 
@@ -48,23 +50,23 @@ public abstract class ThreadContext<E extends Exception> implements ILifeCycle<E
 
   @Override
   public final boolean isStarted() {
-    return context != null;
+    return context.get() != null;
   }
   
   protected void checkIsAlive() {
-    States.requireTrue(context != null, "context not available");
+    States.requireTrue(isStarted(), "context not available");
   }
   
   @Override
   public final synchronized void start() throws E {
     stop();
-    context = new Thread(name) {
+    context.set(new Thread(name) {
       @Override
       public void run() {
         try {
           beforeRun();
         } catch (Exception e) {
-          context = null;
+          context.set(null);
           handleException(e);
           return;
         }
@@ -76,12 +78,12 @@ public abstract class ThreadContext<E extends Exception> implements ILifeCycle<E
           runQuietly(() -> ThreadContext.this.handleException(e));
         } finally {
           runQuietly(ThreadContext.this::afterRun);
-          context = null;
+          context.set(null);
         }
       }
-    };
-    context.setDaemon(deamon);
-    context.start();
+    });
+    context.get().setDaemon(deamon);
+    context.get().start();
   }
   
   @Override
@@ -91,15 +93,14 @@ public abstract class ThreadContext<E extends Exception> implements ILifeCycle<E
 
   @Override
   public final synchronized void stop(long timeout) throws E {
-    if (context != null) {
-      context.interrupt();
+    Thread thread; 
+    if ((thread = context.getAndSet(null)) != null) {
+      thread.interrupt();
       try {
-        context.join(timeout);
+        thread.join(timeout);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-      } finally {
-        context = null;
-      }
+      } 
     }
   }
 

@@ -25,18 +25,18 @@
 */
 
 
-package com.github.utils4j;
+package com.github.utils4j.echo.imp;
 
-import java.io.IOException;
+import com.github.utils4j.imp.Strings;
 
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
-
-import io.reactivex.Observable;
-
-public interface IDownloader {
-  Observable<HttpUriRequest> newRequest();
+public final class Networks {
+  private Networks() {}
   
-  String match(String uri);
-
-  void download(String url, IDownloadStatus status) throws IOException, InterruptedException;
+  public static boolean isLoopbackEndpoint(String host) {
+    host = Strings.trim(host).toLowerCase();
+    return 
+    host.startsWith("127.0.0.1") ||      //ipv4 loopback local address
+    host.startsWith("localhost") ||      //ipv4 loopback local name
+    host.startsWith("0:0:0:0:0:0:0:1");  //ipv6 loopback local address
+  }
 }

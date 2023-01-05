@@ -33,4 +33,6 @@ import com.github.utils4j.imp.function.IProvider;
 
 public interface IGetCodec {
   void get(IProvider<HttpGet> provider, IDownloadStatus status) throws Exception;
+
+  String get(IProvider<HttpGet> provider) throws Exception;
 }
