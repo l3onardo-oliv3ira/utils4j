@@ -24,34 +24,17 @@
 * SOFTWARE.
 */
 
+package com.github.utils4j.imp;
 
-package com.github.utils4j.gui.imp;
+public enum Media {
+  PDF,
+  MP4;
 
-import com.github.utils4j.gui.IPicture;
-
-public enum Images implements IPicture {
-  FIRST("/file-first.png"),
-  
-  UP("/file-up.png"),
-
-  DOWN("/file-down.png"),
-  
-  LAST("/file-last.png"),
-  
-  ADD("/file-add.png"),
-  
-  REM("/file-rem.png"),
-  
-  ECHO("/echo.png");
-
-  final String path;
-  
-  Images(String path) {
-    this.path = path;
+  public String getExtension() {
+    return name().toLowerCase();
   }
-
-  @Override
-  public String path() {
-    return path;
+  
+  public String getExtension(boolean dot) {
+    return dot ? "." + getExtension() : getExtension();
   }
-}
+};

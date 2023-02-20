@@ -32,6 +32,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 
 public class SimpleFrame extends JEscFrame {
+  
   private static final long serialVersionUID = 1L;
 
   public SimpleFrame(String title) {
@@ -52,6 +53,10 @@ public class SimpleFrame extends JEscFrame {
     SwingTools.showToFront(this);
   }  
   
+  public final void toCenter() {
+    super.setLocationRelativeTo(null);
+  }
+
   public void close() {
     this.setVisible(false);
     this.dispose();
@@ -60,9 +65,4 @@ public class SimpleFrame extends JEscFrame {
   protected void setFixedMinimumSize(Dimension dimension) {
     SwingTools.setFixedMinimumSize(this, dimension);
   }
-  
-  protected final void toCenter() {
-    super.setLocationRelativeTo(null);
-  }
-
 }

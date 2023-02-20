@@ -25,33 +25,14 @@
 */
 
 
-package com.github.utils4j.gui.imp;
+package com.github.utils4j;
 
-import com.github.utils4j.gui.IPicture;
+import java.util.Iterator;
 
-public enum Images implements IPicture {
-  FIRST("/file-first.png"),
-  
-  UP("/file-up.png"),
+public interface ISmartIterator<T> extends Iterator<T>{
+  void reset();
 
-  DOWN("/file-down.png"),
+  boolean hasPrevious();
   
-  LAST("/file-last.png"),
-  
-  ADD("/file-add.png"),
-  
-  REM("/file-rem.png"),
-  
-  ECHO("/echo.png");
-
-  final String path;
-  
-  Images(String path) {
-    this.path = path;
-  }
-
-  @Override
-  public String path() {
-    return path;
-  }
+  T previous();
 }

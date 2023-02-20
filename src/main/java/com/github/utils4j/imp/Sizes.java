@@ -27,13 +27,15 @@
 
 package com.github.utils4j.imp;
 
+import java.util.Locale;
+
 public enum Sizes {
-  _1B(1, "B"),
-  _1KB(_1B.size * 1024, "KB"),
-  _1MB(_1KB.size * 1024, "MB"),
-  _1GB(_1MB.size * 1024, "GB"),
-  _1TB(_1GB.size * 1024, "TB"),
-  _1PB(_1TB.size * 1024, "PB");
+  B(1, "B"),
+  KB(B.size * 1024, "KB"),
+  MB(KB.size * 1024, "MB"),
+  GB(MB.size * 1024, "GB"),
+  TB(GB.size * 1024, "TB"),
+  PB(TB.size * 1024, "PB");
   
   private final long size;
   private final String label;
@@ -43,19 +45,26 @@ public enum Sizes {
     this.label = label;
   }
   
-  public static String defaultFormat(long size) {
-    if (size < _1KB.size)
-      return _1B.format(size);
-    if (size < _1MB.size)
-      return _1KB.format(size);
-    if (size < _1GB.size)
-      return _1MB.format(size);
-    if (size < _1TB.size)
-      return _1GB.format(size);
-    return _1TB.format(size);
+  public static String defaultFormat(double size) {
+    if (size < KB.size)
+      return B.format(size);
+    if (size < MB.size)
+      return KB.format(size);
+    if (size < GB.size)
+      return MB.format(size);
+    if (size < TB.size)
+      return GB.format(size);
+    return TB.format(size);
+  }
+  
+  public long toBytes(double size) {
+    return (long)(this.size * size); 
   }
 
-  String format(long size) {
-    return String.format("%.2f %s", ((double)size / this.size), label);
+  private String format(double size) {
+    double value = size / this.size;
+    if (size % this.size == 0)
+      return String.format("%d %s", (long)value, label);
+    return String.format(Locale.US, "%.2f %s", value, label);
   }
 }

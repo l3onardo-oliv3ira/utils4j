@@ -27,7 +27,7 @@
 
 package com.github.utils4j.gui.imp;
 
-import static com.github.utils4j.imp.Threads.startAsync;
+import static com.github.utils4j.imp.Threads.startDaemon;
 import static com.github.utils4j.imp.Throwables.tryCall;
 import static com.github.utils4j.imp.Throwables.tryRuntime;
 import static java.util.Optional.empty;
@@ -142,7 +142,7 @@ public class SwingTools {
   }
 
   private static void toFront(Window window, Boolean top) {
-    startAsync(() -> invokeLater(() -> {
+    startDaemon(() -> invokeLater(() -> {
       if (Jvms.isWindows())
         window.toFront();
       if (top != null) {

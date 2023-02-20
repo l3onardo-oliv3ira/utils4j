@@ -43,6 +43,8 @@ import com.github.utils4j.imp.Args;
 
 public final class LookAndFeelsInstaller {
 
+  public static final String UNDEFINED = "undefined";
+  
 /*
 Metal
 CDE/Motif
@@ -52,16 +54,16 @@ Windows Classic
 */
   private LookAndFeelsInstaller() {}
 
-  public static void install(String looksAndFeelsName) { 
+  public static void install(String looksAndFeelsName) throws Exception { 
     install(looksAndFeelsName, null);
   }
   
-  public static void install(String looksAndFeelsName, Component root) {
+  public static void install(String looksAndFeelsName, Component root) throws Exception {
     Args.requireNonNull(looksAndFeelsName, "looksAndFeels is null");
     
     LookAndFeel laf = getLookAndFeel();
 
-    String currentLookAndFeels = laf == null ? "undefined" : laf.getName();
+    String currentLookAndFeels = laf == null ? UNDEFINED : laf.getName();
     
     if (currentLookAndFeels.equals(looksAndFeelsName))
       return;
@@ -69,7 +71,7 @@ Windows Classic
     boolean installed = false;
     for (LookAndFeelInfo info : getInstalledLookAndFeels()) {
       if (info.getName().equals(looksAndFeelsName)) {
-        tryRuntime(() -> setLookAndFeel(info.getClassName())); 
+        setLookAndFeel(info.getClassName()); 
         installed = true;
         break;
       }

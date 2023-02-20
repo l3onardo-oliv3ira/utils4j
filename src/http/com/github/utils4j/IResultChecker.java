@@ -27,8 +27,8 @@
 
 package com.github.utils4j;
 
-import com.github.utils4j.imp.function.IHandler;
+public interface IResultChecker {
+  static IResultChecker NOTHING = (r, code) -> {};
 
-public interface IResultChecker extends IHandler<String, Exception> {
-  static IResultChecker NOTHING = (r) -> {};
+  void handle(String content, int code) throws Exception;
 }

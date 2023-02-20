@@ -39,7 +39,7 @@ import com.github.utils4j.imp.Strings;
 
 public class EchoNotifierWindow extends EchoNotifier {
   
-  private static final String DEFAULT_HEADER_FORMAT = 
+  protected static final String DEFAULT_RECEIVE_HEADER_FORMAT = 
       "==========================================================================\n" +
       " Recebida requisição %s: \n" +
       "==========================================================================\n";
@@ -55,7 +55,7 @@ public class EchoNotifierWindow extends EchoNotifier {
   }
   
   public EchoNotifierWindow(String title) {
-    this(title, DEFAULT_HEADER_FORMAT);
+    this(title, DEFAULT_RECEIVE_HEADER_FORMAT);
   }
   
   public EchoNotifierWindow(String title, String headerFormat) {

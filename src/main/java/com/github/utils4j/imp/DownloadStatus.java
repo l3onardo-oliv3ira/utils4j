@@ -33,10 +33,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.utils4j.IDownloadStatus;
 
 public class DownloadStatus implements IDownloadStatus {
 
+  protected static final Logger LOGGER = LoggerFactory.getLogger(IDownloadStatus.class);
+  
   private File output;
 
   private OutputStream out;
@@ -144,6 +149,7 @@ public class DownloadStatus implements IDownloadStatus {
   
   protected void onStepEnd() throws InterruptedException {}
   
-  protected void onStepFail(Throwable e) {}
-
+  protected void onStepFail(Throwable e) {
+    LOGGER.warn("step fail", e);
+  }
 }

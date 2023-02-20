@@ -27,8 +27,10 @@
 
 package com.github.utils4j.gui.imp;
 
+import static com.github.utils4j.gui.IThrowableTracker.orNothing;
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
 import static com.github.utils4j.imp.Strings.empty;
+import static com.github.utils4j.imp.Strings.padStart;
 import static com.github.utils4j.imp.Strings.trim;
 
 import java.awt.BorderLayout;
@@ -54,6 +56,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 
+import com.github.utils4j.gui.IThrowableTracker;
 import com.github.utils4j.imp.Strings;
 import com.github.utils4j.imp.Throwables;
 
@@ -70,11 +73,19 @@ public final class ExceptionAlert extends SimpleFrame {
   }
   
   public static void show(Image icon, String message, String detail, Throwable cause) {
-    invokeLater(() -> display(icon, message, detail, cause));
+    show(icon, message, detail, cause, IThrowableTracker.NOTHING);
   }
 
-  private static void display(Image icon, String message, String detail, Throwable cause) {
-    new ExceptionAlert(icon, message, detail, cause).display();
+  public static void show(String message, String detail, Throwable cause, IThrowableTracker tracker) {
+    show(null, message, detail, cause, tracker);
+  }
+
+  public static void show(Image icon, String message, String detail, Throwable cause, IThrowableTracker tracker) {
+    invokeLater(() -> display(icon, message, detail, cause, tracker));
+  }
+  
+  private static void display(Image icon, String message, String detail, Throwable cause, IThrowableTracker tracker) {
+    new ExceptionAlert(icon, message, detail, cause, tracker).display();
   }
   
   private static final Dimension MININUM_SIZE = new Dimension(420, 160);
@@ -85,42 +96,45 @@ public final class ExceptionAlert extends SimpleFrame {
   
   private final JScrollPane centerPane = new JScrollPane();
   
-  private final JLabel seeDetailLabel = new JLabel("<html><u>Ver detalhes</u></html>");
+  private final JLabel detailLabel = new JLabel("<html><u>Ver detalhes</u></html>");
   
-  private ExceptionAlert(Image icon, String message, String detail, Throwable cause) {
+  private ExceptionAlert(Image icon, String message, String detail, Throwable cause, IThrowableTracker tracker) {
     super("Mensagem de erro", icon);
-    setupLayout(message, detail, cause);
+    setupLayout(message, detail, cause, tracker);
     setupListeners();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     setFixedMinimumSize(MININUM_SIZE);
     setAutoRequestFocus(true);
   }
 
-  private void setupLayout(String message, String detail, Throwable cause) {
+  @Override
+  protected void onEscPressed(ActionEvent e) {
+    super.onEscPressed(e);    
+  }
+
+  private void display() {
+    this.toCenter();
+    this.showToFront(); 
+  }
+  
+  private void setupLayout(String message, String detail, Throwable cause, IThrowableTracker tracker) {
     JPanel contentPane = new JPanel();
     contentPane.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
     contentPane.setLayout(new BorderLayout(0, 0));
     contentPane.add(north(message), BorderLayout.NORTH);
-    contentPane.add(center(detail, cause), BorderLayout.CENTER);
+    contentPane.add(center(detail, cause, tracker), BorderLayout.CENTER);
     contentPane.add(south(), BorderLayout.SOUTH);
     setContentPane(contentPane);
   }
 
-  private void setupListeners() {
-    addWindowStateListener(new WindowStateListener() {
-      public void windowStateChanged(WindowEvent e) {
-        if ((e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH){
-          seeDetailLabel.setText("<html><u>Esconder detalhes</u></html>");
-        } else if ((e.getNewState() & Frame.NORMAL) == Frame.NORMAL) {
-          seeDetailLabel.setText("<html><u>Ver detalhes</u></html>");
-        }
-      }
-    });    
-  }
-  
-  @Override
-  protected void onEscPressed(ActionEvent e) {
-    super.onEscPressed(e);    
+  private JScrollPane center(String detail, Throwable cause, IThrowableTracker tracker) {
+    textArea.setRows(8);
+    textArea.setEditable(false);
+    centerPane.setViewportView(textArea);
+    centerPane.setVisible(false);
+    textArea.setText(causes(detail, cause, tracker));
+    textArea.setCaretPosition(0);
+    return centerPane;
   }
 
   private JPanel south() {
@@ -134,42 +148,6 @@ public final class ExceptionAlert extends SimpleFrame {
     return southPane;
   }
 
-  private JScrollPane center(String detail, Throwable cause) {
-    textArea.setRows(8);
-    textArea.setEditable(false);
-    centerPane.setViewportView(textArea);
-    centerPane.setVisible(false);
-    textArea.setText(trim(detail) + "\n" + Throwables.stackTrace(cause));
-    return centerPane;
-  }
-
-  private JPanel north(String message) {
-    final JPanel northPane = new JPanel();
-    northPane.setLayout(new MigLayout());
-    JLabel activityLabel = new JLabel("<html>&nbsp;" + Strings.trim(message) + "</html>");
-    activityLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
-    activityLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
-    activityLabel.setHorizontalAlignment(SwingConstants.LEFT);
-    northPane.add(activityLabel, "wrap");
-    
-    JPanel detailPanel = new JPanel();
-    detailPanel.setLayout(new MigLayout("center"));
-    seeDetailLabel.setVerticalAlignment(SwingConstants.BOTTOM);
-    seeDetailLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    seeDetailLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    seeDetailLabel.setVerticalAlignment(SwingConstants.CENTER);
-    seeDetailLabel.setForeground(Color.BLUE);
-    seeDetailLabel.setFont(new Font("Tahoma", Font.ITALIC, 12));
-    seeDetailLabel.addMouseListener(new MouseAdapter(){  
-      public void mouseClicked(MouseEvent e) {
-        setDetail(seeDetailLabel);
-      }
-    });
-    detailPanel.add(seeDetailLabel);
-    northPane.add(detailPanel, "pushx, growx");
-    return northPane;
-  }
-  
   private void setDetail(JLabel seeDetailsPane) {
     boolean show = seeDetailsPane.getText().contains("Ver");
     if (show) {
@@ -181,10 +159,74 @@ public final class ExceptionAlert extends SimpleFrame {
     southPane.setVisible(show);
   }
 
-  private void display() {
-    this.toCenter();
-    this.showToFront(); 
+  private void setupListeners() {
+    addWindowStateListener(new WindowStateListener() {
+      public void windowStateChanged(WindowEvent e) {
+        if ((e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH){
+          detailLabel.setText("<html><u>Esconder detalhes</u></html>");
+        } else if ((e.getNewState() & Frame.NORMAL) == Frame.NORMAL) {
+          detailLabel.setText("<html><u>Ver detalhes</u></html>");
+        }
+      }
+    });    
+  }
+
+  private void setDetailLabel() {
+    detailLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+    detailLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    detailLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    detailLabel.setVerticalAlignment(SwingConstants.CENTER);
+    detailLabel.setForeground(Color.BLUE);
+    detailLabel.setFont(new Font("Tahoma", Font.ITALIC, 12));
+    detailLabel.addMouseListener(new MouseAdapter(){  
+      public void mouseClicked(MouseEvent e) {
+        setDetail(detailLabel);
+      }
+    });
+  }
+  
+  private JPanel north(String message) {
+    JLabel errorLabel = new JLabel("<html>&nbsp;" + Strings.trim(message) + "</html>");
+    errorLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
+    errorLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
+    errorLabel.setHorizontalAlignment(SwingConstants.LEFT);
+    
+    setDetailLabel();
+
+    JPanel detailPanel = new JPanel();
+    detailPanel.setLayout(new MigLayout("center"));
+    detailPanel.add(detailLabel);
+
+    JPanel northPane = new JPanel();
+    northPane.setLayout(new MigLayout());
+    northPane.add(errorLabel, "wrap");
+    northPane.add(detailPanel, "pushx, growx");
+    return northPane;
+  }
+
+  private String causes(String detail, Throwable cause, IThrowableTracker tracker) {
+    final StringBuilder sb = new StringBuilder()
+      .append(detail = trim(detail))
+      .append(detail.length() > 0 ? "\n\n" : empty());
+    final String[] messages = orNothing(tracker).track(cause);
+    final int size = messages.length;
+    if (size > 0) {
+      sb.append("IDENTIFICADA(S) A(S) SEGUINTE(S) CAUSA(S):\n");
+      int i = 0, n = 1;
+      do {
+        String message;
+        if (!(message = trim(messages[i])).isEmpty()) {
+          sb.append("\t")
+            .append(padStart(n++, 2))
+            .append(") ")
+            .append(message)
+            .append('\n');
+        }
+      } while(++i < size);
+      sb.append("\n********************************************************************\n");
+    };
+    sb.append("INFORMAÇÕES TÉCNICAS:\n")
+      .append(Throwables.stackTrace(cause));
+    return sb.toString();
   }
 }
-
-

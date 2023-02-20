@@ -27,7 +27,10 @@
 
 package com.github.utils4j.imp;
 
+import java.nio.charset.Charset;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.utils4j.IConstants;
 
 public abstract class Objects {
   
@@ -43,6 +46,22 @@ public abstract class Objects {
   
   public static String toString(char[] input, String defaultIfNull) {
     return input != null ? new String(input) : defaultIfNull;
+  }
+  
+  public static String iso2utf8(char[] input, String defaultIfNull) {
+    return input != null ? iso2utf8(input) : defaultIfNull;
+  }
+  
+  public static String iso2utf8(char[] input) {
+    return fromIso(input, IConstants.UTF_8);
+  }
+  
+  public static String fromIso(char[] input, Charset outputCharset) {
+    return new String(new String(input).getBytes(IConstants.ISO_8859_1), outputCharset);
+  }
+
+  public static String toString(char[] input, Charset inputCharset, Charset outputCharset) {
+    return new String(new String(input).getBytes(inputCharset), outputCharset);
   }
 
   public static String toJson(Object instance) throws JsonProcessingException {

@@ -82,31 +82,43 @@ public class Containers {
     return e == null || !e.hasMoreElements();
   }
 
-  public static boolean isEmpty(Object[] value) {
-    return value == null || value.length == 0;    
+  public static <T> boolean isEmpty(T[] value) {
+    return value == null || value.length == 0;
   }
-
-  public static boolean isEmpty(Number[] value) {
-    return value == null || value.length == 0;    
-  }
-
+  
   public static boolean isEmpty(byte[] value) {
     return value == null || value.length == 0;    
   }
   
+  public static boolean isEmpty(int[] value) {
+    return value == null || value.length == 0;    
+  }
+
+  public static boolean isEmpty(float[] value) {
+    return value == null || value.length == 0;    
+  }
+
+  public static boolean isEmpty(double[] value) {
+    return value == null || value.length == 0;    
+  }
+
+  public static boolean isEmpty(long[] value) {
+    return value == null || value.length == 0;    
+  }
+
   @SafeVarargs
   public static <T> List<T> arrayList(T... array) {
-    return arrayList(Predicates.all(), array);
+    return isEmpty(array) ? new ArrayList<>() : arrayList(Predicates.all(), array);
   }
   
   @SafeVarargs
   public static <T> List<T> arrayList(Predicate<T> filter, T... array) {
     return Arrays.asList(array).stream().filter(filter).collect(Collectors.toList());
   }
-
-  public static String[] arrayOf(List<String> container) {
+  
+  public static String[] arrayOf(Collection<String> container) {
     if (container == null)
-      return null;
+      return Strings.emptyArray();
     return container.toArray(new String[container.size()]);
   }
   

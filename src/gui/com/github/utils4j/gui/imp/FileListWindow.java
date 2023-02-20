@@ -28,12 +28,8 @@
 package com.github.utils4j.gui.imp;
 
 import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
-import static com.github.utils4j.imp.Strings.empty;
-import static com.github.utils4j.imp.Strings.optional;
-import static com.github.utils4j.imp.Strings.trim;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -46,49 +42,55 @@ import java.io.FilenameFilter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.Border;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import com.github.utils4j.imp.Args;
 import com.github.utils4j.imp.Containers;
 import com.github.utils4j.imp.Dates;
+import com.github.utils4j.imp.Directory;
+import com.github.utils4j.imp.Media;
 import com.github.utils4j.imp.Pair;
 import com.github.utils4j.imp.Sizes;
-import com.github.utils4j.imp.Strings;
 
 import net.miginfocom.swing.MigLayout;
 
 public class FileListWindow extends SimpleDialog implements IFileListView {
 
-  private static final int MIN_WIDTH = 500;
-  private static final int MIN_HEIGHT = 250;
+  private static final int MIN_WIDTH = 600;
+  private static final int MIN_HEIGHT = 325;
 
-  private JTextField fileName = new JTextField();
-  private Border defaultBorder = fileName.getBorder();
   private JTable table;
+  private File outputFile;
+  private File currentDir;
+  private Media media;
   private FileTableModel tableModel;
 
-  public FileListWindow(Image icon, List<File> files) {
+  private final DelayedFileChooser chooser = DelayedFileChooser.DIALOG;
+  
+  public FileListWindow(Image icon, List<File> files, Media media) {
+    this(icon, files, media, null);
+  }
+  
+  public FileListWindow(Image icon, List<File> files, Media media, File currentDir) {
     super("Ordem dos arquivos", icon, true);
-    Args.requireNonEmpty(files, "files is empty");
+    Args.requireNonNull(files, "files is empty");
+    Args.requireNonNull(media, "media is null");
+    this.media = media;
+    this.currentDir = currentDir;
     setLayout(new BorderLayout());
-    setupFieldName();
     createCenter(files);
     createEast();
     createSouth();
-    setSize(new Dimension(650, 300));
+    setSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
     setFixedMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
     toCenter();
     setAutoRequestFocus(true);
@@ -101,23 +103,21 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     });
   }
 
+  private JButton saveAtButton;
+  
   private void createSouth() {
-    JButton okButton = new JButton("Salvar");
-    okButton.addActionListener(this::onSave);
+    saveAtButton = new JButton("Salvar...");
+    saveAtButton.addActionListener(this::onSave);
+    
     JButton cancelButton = new JButton("Cancelar");
     cancelButton.addActionListener(this::onEscPressed);
     JPanel actionPanel = new JPanel();
     actionPanel.setLayout(new MigLayout("fillx", "push[][]", "[][]"));
-    actionPanel.add(okButton);
+    actionPanel.add(saveAtButton);
     actionPanel.add(cancelButton);
 
     JPanel southPanel = new JPanel();
     southPanel.setLayout(new BorderLayout());
-    JPanel textPanel = new JPanel();
-    textPanel.setLayout(new MigLayout());
-    textPanel.add(new JLabel("Nome do arquivo gerado: "));
-    textPanel.add(fileName, "pushx, growx");
-    southPanel.add(textPanel, BorderLayout.CENTER);
     southPanel.add(actionPanel, BorderLayout.EAST);
     add(southPanel, BorderLayout.SOUTH);
   }
@@ -125,18 +125,32 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   private void createEast() {
     JButton firstButton = new JButton(Images.FIRST.asIcon());
     firstButton.addActionListener(this::onFirst);
+    firstButton.setToolTipText("Mover para a primeira posição.");
     JButton upButton = new JButton(Images.UP.asIcon());
+    upButton.setToolTipText("Mover para uma posição acima.");
     upButton.addActionListener(this::onUp);
     JButton downButton = new JButton(Images.DOWN.asIcon());
+    downButton.setToolTipText("Mover para uma posição abaixo.");
     downButton.addActionListener(this::onDown);
     JButton lastButton = new JButton(Images.LAST.asIcon());
     lastButton.addActionListener(this::onLast);
+    lastButton.setToolTipText("Mover para a última posição.");
+    JButton addButton = new JButton(Images.ADD.asIcon());
+    addButton.addActionListener(this::onAdd);
+    addButton.setToolTipText("Adicionar um novo arquivo à lista.");
+    JButton remButton = new JButton(Images.REM.asIcon());
+    remButton.setToolTipText("Remover arquivo(s) selecionado(s) da lista.");
+    remButton.addActionListener(this::onRem);
+
     JPanel eastPane = new JPanel();
     eastPane.setLayout(new MigLayout());
     eastPane.add(firstButton, "wrap");
     eastPane.add(upButton, "wrap");
     eastPane.add(downButton, "wrap");
-    eastPane.add(lastButton);
+    eastPane.add(lastButton, "wrap");
+    eastPane.add(new JPanel(), "wrap");
+    eastPane.add(addButton, "wrap");
+    eastPane.add(remButton, "wrap");
     add(eastPane, BorderLayout.EAST);
   }
 
@@ -158,10 +172,9 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
         selectedRows = table.getSelectedRows();
       }
     });
-
     JPanel panel = new JPanel();
     panel.setLayout(new MigLayout());
-    panel.add(new JScrollPane(table), "pushx, growy, growx");
+    panel.add(new JScrollPane(table), "pushx, pushy, growy, growx");
     add(panel, BorderLayout.CENTER);
   }
 
@@ -174,22 +187,22 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
       false
     );
     if (choice == Dialogs.Choice.YES) {
-      this.fileName.setText(empty());
+      this.outputFile = null;
       this.close();
     }
   }
 
   private void onSave(ActionEvent e) {
-    Optional<String> fileName = optional(trim(this.fileName.getText()).replaceAll("[\\\\/:*?\"<>|%]", empty()));
-    if (fileName.isPresent()) {
-      this.fileName.setText(fileName.get());
-      close();
-    } else {
-      this.fileName.setText("");
-      this.fileName.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-    }
+    chooser.filesOnly().select("onde será salvo o arquivo final", media, currentDir)
+      .map(Directory::stringPath)
+      .map(s -> s.toLowerCase().endsWith(media.getExtension(true)) ? s : s + media.getExtension(true))
+      .map(s -> new File(s))
+      .ifPresent(f -> {
+        outputFile = f;
+        close();
+      });
   }
-
+  
   private void scrollToVisible(int rowIndex, int vColIndex) {
     table.scrollRectToVisible(new Rectangle(table.getCellRect(rowIndex, 0, true)));
   }
@@ -222,26 +235,17 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
     };
   }
   
-  private void setupFieldName() {
-    fileName.setText(empty());
-    fileName.getDocument().addDocumentListener(new DocumentListener() {
-      @Override
-      public void insertUpdate(DocumentEvent e) {
-        fileName.setBorder(defaultBorder);
-      }
-
-      @Override
-      public void removeUpdate(DocumentEvent e) {
-        fileName.setBorder(defaultBorder);
-      }
-
-      @Override
-      public void changedUpdate(DocumentEvent e) {
-        fileName.setBorder(defaultBorder);
-      }
-    });
+  private void onAdd(ActionEvent e) {
+    chooser.filesOnly().multiSelect("adição de novos arquivos", Media.PDF, currentDir).ifPresent(f -> Stream.of(f).forEach(tableModel::add));
+    saveAtButton.setEnabled(tableModel.getRowCount() > 0);
   }
-
+  
+  private void onRem(ActionEvent e) {
+    if (selectedRows.length > 0)
+      tableModel.delete(selectedRows);
+    saveAtButton.setEnabled(tableModel.getRowCount() > 0);
+  }
+  
   private static class SizeTableCellRenderer extends DefaultTableCellRenderer {
     public SizeTableCellRenderer() {
       setHorizontalAlignment(JLabel.CENTER);
@@ -273,14 +277,14 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   }
 
   @Override
-  public Optional<String> getFileName() {
-    this.showToFront();
-    return Strings.optional(fileName.getText());
+  public Optional<File> getOutputFile() {
+    showToFront();
+    return Optional.ofNullable(outputFile);
   }
 
   private static List<File> createListFiles() {
     return Containers
-      .arrayList(new File("E:\\jfms\\test-shell\\pdfs\\GRANDES\\huge_(VOLUMES DE 1 PÁGINA)").listFiles(new FilenameFilter() {
+      .arrayList(new File("D:\\temp\\pdfs").listFiles(new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
           return name.endsWith(".pdf");
@@ -291,8 +295,8 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
   public static void main(String[] args) {
     invokeLater(() -> {
       List<File> files = createListFiles();
-      IFileListView window = new FileListWindow(Images.FIRST.asImage(), files);
-      String fileName = window.getFileName().orElse("nada informado");
+      IFileListView window = new FileListWindow(Images.FIRST.asImage(), files, Media.PDF, null);
+      File fileName = window.getOutputFile().orElse(null);
       System.out.println(fileName);
       System.exit(0);
     });

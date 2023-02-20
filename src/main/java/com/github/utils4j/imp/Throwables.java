@@ -79,6 +79,24 @@ public final class Throwables {
   public static void tryRun(boolean logQuietly, IExecutable<?> e) {
     tryRun(e, false, logQuietly);
   }
+  
+  public static void throwIf(boolean condition, String message) throws Exception {
+    throwIf(condition, message, null);
+  }
+  
+  public static void throwIf(boolean condition, String message, Throwable cause) throws Exception {
+    throwIf(() -> condition, message, cause); 
+  }
+  
+  public static void throwIf(Supplier<Boolean> condition, String message) throws Exception {
+    throwIf(condition, message, null);
+  }
+  
+  public static void throwIf(Supplier<Boolean> condition, String message, Throwable cause) throws Exception {
+    if (condition.get()) {
+      throw cause != null ? new Exception(message, cause) : new Exception(message);
+    }
+  }
 
   public static boolean tryRun(IExecutable<?> e, boolean defaultIfFail, boolean logQuietly) {
     try {

@@ -27,6 +27,8 @@
 
 package com.github.utils4j.imp;
 
+import static com.github.utils4j.imp.Strings.padStart;
+
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -57,6 +59,10 @@ public class Dates {
     return localDateTime(date, zoneId).toLocalDate();
   }
 
+  public static Date toDate(LocalDate date, ZoneId zoneId) {
+    return Date.from(date.atStartOfDay(zoneId).toInstant());
+  }
+  
   public static LocalDateTime localDateTime(long date, ZoneId zoneId) {
     return LocalDateTime.ofInstant(Instant.ofEpochMilli(date), zoneId);
   }
@@ -75,6 +81,10 @@ public class Dates {
   
   public static String defaultFormat(Date date) {
     return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", BRAZIL).format(date);
+  }
+  
+  public static String defaultFormat(LocalDate date) {
+    return padStart(date.getDayOfMonth(), 2) + "/" + padStart(date.getMonthValue(), 2) + "/" + padStart(date.getYear(), 4);
   }
 
   public static String format(String format, Date date) {

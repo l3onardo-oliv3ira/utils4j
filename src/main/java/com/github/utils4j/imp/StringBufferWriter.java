@@ -24,47 +24,73 @@
 * SOFTWARE.
 */
 
-
 package com.github.utils4j.imp;
 
-import java.util.NoSuchElementException;
+import java.io.Serializable;
+import java.io.Writer;
 
-import com.github.utils4j.ISmartIterator;
+public class StringBufferWriter extends Writer implements Serializable {
 
-public class ArrayIterator<T> implements ISmartIterator<T> {
-  private int current = 0;
-  private T[] array;
-  
-  public ArrayIterator(T... array) {
-    this.array = Args.requireNonNull(array, "array is null");
+  private final StringBuffer buffer;
+
+  public StringBufferWriter() {
+    this.buffer = new StringBuffer();
   }
-  
-  @Override
-  public final boolean hasNext() {
-    return current < array.length;
+
+  public StringBufferWriter(int capacity) {
+    this.buffer = new StringBuffer(capacity);
   }
-  
-  @Override
-  public final boolean hasPrevious() {
-    return current > 0;
+
+  public StringBufferWriter(StringBuffer buffer) {
+    this.buffer = buffer != null ? buffer : new StringBuffer();
   }
 
   @Override
-  public final T next() {
-    if (current == array.length)
-      throw new NoSuchElementException();
-    return array[current++];
+  public Writer append(char value) {
+    buffer.append(value);
+    return this;
   }
 
   @Override
-  public final void reset() {
-    current = 0;
+  public Writer append(CharSequence value) {
+    buffer.append(value);
+    return this;
   }
 
   @Override
-  public final T previous() {
-    if (current == 0)
-      throw new NoSuchElementException();
-    return array[--current];
+  public Writer append(CharSequence value, int start, int end) {
+    buffer.append(value, start, end);
+    return this;
+  }
+
+  @Override
+  public void close() {
+  }
+
+  @Override
+  public void flush() {
+  }
+
+  @Override
+  public void write(String value) {
+    if (value != null) {
+      buffer.append(value);
+    }
+  }
+
+  @Override
+  public void write(char[] value, int offset, int length) {
+    if (value != null) {
+      buffer.append(value, offset, length);
+    }
+  }
+
+  public StringBuffer getBuilder() {
+    return buffer;
+  }
+
+  @Override
+  public String toString() {
+    return buffer.toString();
   }
 }

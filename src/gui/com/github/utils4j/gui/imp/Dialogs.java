@@ -206,15 +206,15 @@ public final class Dialogs {
     }
   }
 
-  public static Float getFloat(final String message, final Float defaultValue, final Float min, final Float max) {
+  public static Double getDouble(final String message, final Double defaultValue, final Double min, final Double max) {
     for (;;) {
       final String textInput = input(message, defaultValue);
       if (textInput == null) {
         return null;
       }
-      Float input;
+      Double input;
       try {
-        input = Float.parseFloat(textInput);
+        input = Double.parseDouble(textInput);
       } catch (NumberFormatException ex) {
         if (textInput.equals("")) {
           error("Informe um número");

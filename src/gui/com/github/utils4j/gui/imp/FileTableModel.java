@@ -26,7 +26,10 @@
 
 
 package com.github.utils4j.gui.imp;
+import static java.util.stream.Collectors.toList;
+
 import java.io.File;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +38,7 @@ import javax.swing.table.AbstractTableModel;
 import com.github.utils4j.imp.Args;
 import com.github.utils4j.imp.Pair;
 
-public class FileTableModel extends AbstractTableModel {
+class FileTableModel extends AbstractTableModel {
   private static final int COLUMN_NAME = 0;
   private static final int COLUMN_DATE = 1;
   private static final int COLUMN_SIZE = 2;
@@ -127,5 +130,15 @@ public class FileTableModel extends AbstractTableModel {
     Pair<Integer, Integer> r = Pair.of(begin, end);
     fireTableDataChanged();
     return r;
+  }
+
+  public void delete(int[] rows) {
+    Arrays.stream(rows).mapToObj(i -> entries.get(i)).collect(toList()).forEach(entries::remove);
+    fireTableDataChanged();
+  }
+  
+  public void add(File file) {
+    entries.add(file);
+    fireTableDataChanged();
   }
 }

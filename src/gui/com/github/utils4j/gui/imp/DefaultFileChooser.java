@@ -62,9 +62,9 @@ public class DefaultFileChooser extends JFileChooser {
     UIManager.put("FileChooser.fileSizeHeaderText", "Tamanho");
     UIManager.put("FileChooser.fileTypeHeaderText", "Tipo");
     UIManager.put("FileChooser.fileDateHeaderText", "Data");
-    UIManager.put("FileChooser.fileAttrHeaderText", "Atributos");
-  }
-
+    UIManager.put("FileChooser.fileAttrHeaderText", "Atributos");    
+  }  
+  
   @Override
   protected JDialog createDialog(final Component parent) throws HeadlessException {
     final JDialog dialog = super.createDialog(parent);

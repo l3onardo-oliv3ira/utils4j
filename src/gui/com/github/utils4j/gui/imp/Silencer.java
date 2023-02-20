@@ -27,7 +27,12 @@
 
 package com.github.utils4j.gui.imp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class Silencer {
+  
+  private static Logger LOGGER = LoggerFactory.getLogger(Silencer.class);
   
   private Silencer() {}
   
@@ -36,11 +41,17 @@ public abstract class Silencer {
   }
 
   public static void failAs(boolean silent, String message, Exception e, String detail) {
-    runAs(silent, () -> ExceptionAlert.show(message, detail, e));
+    runAs(silent, () -> {
+      LOGGER.warn(message, e);
+      ExceptionAlert.show(message, detail, e);
+    });
   }
   
   public static void infoAs(boolean silent, String message) {
-    runAs(silent, () -> MessageAlert.showInfo(message));
+    runAs(silent, () -> {
+      LOGGER.info(message);
+      MessageAlert.showInfo(message);
+    });
   }
 
   public static void runAs(boolean silent, Runnable r) {

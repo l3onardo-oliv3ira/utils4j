@@ -89,13 +89,12 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
           if (responseText == null) {
             responseText = Strings.empty();
           }
-          
-          if (isSuccess(code)) {
-            checkResults.handle(responseText);
-          }
         }
         
-        if (!isSuccess(code)) {
+        if (isSuccess(code)) {
+          handleSuccess(checkResults, responseText, code);
+        } else {
+          handleFail(checkResults, responseText, code);
           throw launch("Servidor retornando - HTTP Code: " + code + " Content: \n" + responseText);
         }
         
@@ -106,7 +105,13 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
       throw launch("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e));
     }
   }
+
+  protected void handleSuccess(IResultChecker checkResults, String responseText, int httpCode) throws Exception {
+    checkResults.handle(responseText, httpCode);
+  }
  
+  protected void handleFail(IResultChecker checkResults, String responseText, int httpCode) throws Exception {}
+  
   @Override
   public void get(IProvider<HttpGet> provider, IDownloadStatus status) throws Exception {
     

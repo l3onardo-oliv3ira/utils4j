@@ -27,6 +27,13 @@
 
 package com.github.utils4j.imp;
 
+import static com.github.utils4j.imp.Directory.stringPath;
+import static com.github.utils4j.imp.Strings.trim;
+import static java.lang.String.format;
+
+import java.io.File;
+import java.nio.file.Path;
+
 //$MAJOR.$MINOR.$SECURITY.$PATCH for java 9+
 //1.$MAJOR.$MINOR_$UPDATE-$BUILD
 
@@ -34,7 +41,7 @@ package com.github.utils4j.imp;
 public class Jvms {
   private Jvms() {}
 
-  public static String OS_NAME = System.getProperty("os.name").toLowerCase();
+  public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
   public static final String SYSTEM_ROOT = computeSystemRoot();
 
@@ -71,7 +78,20 @@ public class Jvms {
     return System.getProperty("java.version", "");
   }
   
-  public static void main(String[] args) {
-    System.out.println(is64Bits());
+  public static String env(String paramName, File path) {
+    Args.requireText(paramName, "paramName is empty");
+    Args.requireNonNull(path, "path is null");
+    return env(paramName, stringPath(path));
+  }
+  
+  public static String env(String paramName, Path path) {
+    Args.requireText(paramName, "paramName is empty");
+    Args.requireNonNull(path, "path is null");
+    return env(paramName, path.toFile());
+  }
+  
+  public static String env(String paramName, String paramValue) {
+    Args.requireText(paramName, "paramName is empty").trim();
+    return format("-D%s=%s", trim(paramName), trim(paramValue));
   }
 }

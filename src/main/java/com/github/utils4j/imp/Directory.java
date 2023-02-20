@@ -167,21 +167,30 @@ public abstract class Directory {
     }
   }
   
-  public static String stringPath(File path) {
+  public static String stringPath(File file) {
+    return stringPath(file, false);
+  }
+  
+  public static String stringPath(Path path) {
+    return stringPath(path, false);
+  }
+  
+  public static String stringPath(Path path, boolean quotes) {
     if (path == null)
-      return Strings.empty();
-    return stringPath(path.toPath());
+      return quotes ? Strings.quotes("null") : "null";
+    return stringPath(path.toFile(), quotes);
   }
 
-  public static String stringPath(Path path) {
-    if (path == null)
-      return Strings.empty();
-    File f = path.toFile();
+  public static String stringPath(File file, boolean quotes) {
+    if (file == null)
+      return quotes ? Strings.quotes("null") : "null";
+    String path;
     try {
-      return f.getCanonicalPath();
-    }catch(IOException e) {
-      return f.getAbsolutePath();
-    }
+      path = file.getCanonicalPath();
+    } catch(IOException e) {
+      path = file.getAbsolutePath();
+    } 
+    return quotes ? Strings.quotes(path) : path;    
   }
 
   private static void copy(Path source, Path dest) {
