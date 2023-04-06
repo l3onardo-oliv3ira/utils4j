@@ -117,7 +117,7 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   private void releaseLock() {
     if (lock != null) {
       runQuietly(lock::close);
-      lockFile.delete();
+      lockFile.delete();      
       lock = null;
     }
   }

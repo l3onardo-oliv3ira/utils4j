@@ -27,6 +27,7 @@
 
 package com.github.utils4j.gui.imp;
 
+import static com.github.utils4j.gui.imp.SwingTools.invokeLater;
 import static com.github.utils4j.imp.Strings.empty;
 import static com.github.utils4j.imp.Strings.optional;
 import static com.github.utils4j.imp.Strings.trim;
@@ -39,6 +40,7 @@ import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -53,26 +55,26 @@ import net.miginfocom.swing.MigLayout;
 
 public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleDialog {
   
-  private static final String TOOLTIP = "<html><b>Exemplos:</b> <br>"
+  private static final String TOOLTIP = "<html><style>.c{ color: 'blue';}</style>"
       + "<table>"
       + "<tr>"
-      + "  <td>1 <b>;</b> 2 <b>;</b> 5</td>"
+      + "  <td class='c'>1 <b>;</b> 2 <b>;</b> 5</td>"
       + "  <td>Três arquivos: [1], [2] e [5]</td>"
       + "</tr>"
       + "<tr>"
-      + "  <td>10 <b>-</b> 13</td>"
+      + "  <td class='c'>10 <b>-</b> 13</td>"
       + "  <td>Um arquivo: [10, 11, 12, 13]</td>"
       + "</tr>"
       + "<tr>"
-      + "  <td>7 <b>;</b> 9 <b>-</b> 12 <b>;</b> 21</td>"
+      + "  <td class='c'>7 <b>;</b> 9 <b>-</b> 12 <b>;</b> 21</td>"
       + "  <td>Três arquivos: [7], [9, 10, 11, 12] e [21]</td>"
       + "</tr>"
       + "<tr>"
-      + "  <td>11 <b>-</b> *</td>"
+      + "  <td class='c'>11 <b>-</b> *</td>"
       + "  <td>Um arquivo: [11, 12, 13.... última página]</td>"
       + "</tr>"
       + "<tr>"
-      + "  <td>3 <b>;</b> 27 <b>-</b> *</td>"
+      + "  <td class='c'>3 <b>;</b> 27 <b>-</b> *</td>"
       + "  <td>Dois arquivos: [3], [27, 28... última página]</td>"
       + "</tr>"
       + "</html>";
@@ -80,7 +82,7 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
   private static final Border RED_BORDER = BorderFactory.createLineBorder(Color.RED, 2);
   
   public static void show(Image icon) {
-    SwingTools.invokeLater(() -> display(icon));
+    invokeLater(() -> display(icon));
   }
 
   private static void display(Image icon) {
@@ -93,34 +95,40 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
 
   private final JButton okButton = new JButton("OK");
   
-  private final JTextField pages = new JTextField();
+  private final JTextField textField = new JTextField();
   
-  private final Border defaultBorder = pages.getBorder();
+  private final Border defaultBorder = textField.getBorder();
   
   public PrintStyleDialog(Image icon) {
     super("Escolha de páginas", icon, true);
     setLayout(new BorderLayout());
+    add(north(), BorderLayout.NORTH);
     add(center(), BorderLayout.CENTER);
     add(south(), BorderLayout.SOUTH);
     setupPages();
     setResizable(false);
-    setSize(300, 150);
-    toCenter();
     setAutoRequestFocus(true);
     setAlwaysOnTop(true);
+    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    pack();
+    toCenter();    
+  }
+  
+  private JPanel north() {
+    JPanel panel = new JPanel(new MigLayout("fillx"));
+    JLabel label = new JLabel("Informe o intervalo de páginas:");
+    panel.add(label, "wrap");
+    panel.add(textField, "growx");
+    return panel;
   }
 
   private JPanel center() {
-    JPanel panel = new JPanel();
-    panel.setLayout(new MigLayout());
-    JLabel label = new JLabel("Informe o intervalo de páginas:");
-    label.setToolTipText(TOOLTIP);
-    CustomTooltipDelayer.attach(label, 60000);
-    panel.add(label, "wrap");
-    pages.setToolTipText(TOOLTIP);
-    CustomTooltipDelayer.attach(pages, 60000);
-    panel.add(pages, "push, growx");
-    return panel;
+    JPanel textPanel = new JPanel(new MigLayout());
+    JPanel panelHelp = new JPanel();
+    panelHelp.setBorder(BorderFactory.createTitledBorder("Exemplos:"));
+    panelHelp.add(new JLabel(TOOLTIP));
+    textPanel.add(panelHelp);
+    return textPanel;
   }
 
   private JPanel south() {
@@ -136,27 +144,27 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
   }
   
   private void setupPages() {
-    pages.setText(empty());
-    pages.getDocument().addDocumentListener(new DocumentListener() {
+    textField.setText(empty());
+    textField.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
-        pages.setBorder(defaultBorder);
+        textField.setBorder(defaultBorder);
       }
 
       @Override
       public void removeUpdate(DocumentEvent e) {
-        pages.setBorder(defaultBorder);
+        textField.setBorder(defaultBorder);
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        pages.setBorder(defaultBorder);
+        textField.setBorder(defaultBorder);
       }
     });
   }
   
   protected boolean checkSyntax() {
-    String text = Strings.trim(pages.getText());
+    String text = Strings.trim(textField.getText());
     for(int i = 0; i < text.length(); i++) {
       char chr = text.charAt(i);
       if (Character.isDigit(chr) || Character.isWhitespace(chr))
@@ -198,25 +206,25 @@ public final class PrintStyleDialog extends SimpleDialog implements IPrintStyleD
       false
     );
     if (choice == Dialogs.Choice.YES) {
-      this.pages.setText(empty());
+      this.textField.setText(empty());
       this.close();
     }
   }
   
 
   private void onOk(ActionEvent e) {
-    Optional<String> fileName = optional(trim(this.pages.getText()));
+    Optional<String> fileName = optional(trim(this.textField.getText()));
     if (fileName.isPresent() && checkSyntax()) {
       close();
     } else {
-      this.pages.setBorder(RED_BORDER);
+      this.textField.setBorder(RED_BORDER);
     }
   }
   
   @Override
   public Optional<String> getPagesInterval() {
     setVisible(true);
-    return Strings.optional(pages.getText());
+    return Strings.optional(textField.getText());
   }
 
 

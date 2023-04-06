@@ -55,9 +55,9 @@ public abstract class Directory {
     mkDir(path.toFile());
   }
   
-  public static void rmkDir(Path unzipPath) throws IOException {
-    Directory.rmDir(unzipPath);
-    Directory.mkDir(unzipPath);   
+  public static void rmkDir(Path path) throws IOException {
+    Directory.rmDir(path);
+    Directory.mkDir(path);   
   }
   
   public static void rmkDir(File path) throws IOException {
@@ -76,6 +76,15 @@ public abstract class Directory {
     if (input.exists()) 
       throw new IOException(message);
     return input;
+  }
+
+  public static boolean isSameFile(Path p1, Path p2) {
+    try {
+      return Files.isSameFile(p1, p2);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return false;
+    }
   }
 
   public static void delete(File file) throws IOException {

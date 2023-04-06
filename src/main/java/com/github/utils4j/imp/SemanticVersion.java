@@ -73,6 +73,10 @@ public class SemanticVersion {
     return major + "." + minor + "." + patch;
   }
   
+  public final String fullString() {
+    return toString() + ".0";
+  }
+  
   public final int major() {
     return major;
   }

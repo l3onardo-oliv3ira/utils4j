@@ -57,6 +57,7 @@ import com.github.utils4j.imp.Args;
 import com.github.utils4j.imp.Containers;
 import com.github.utils4j.imp.Dates;
 import com.github.utils4j.imp.Directory;
+import com.github.utils4j.imp.Jvms;
 import com.github.utils4j.imp.Media;
 import com.github.utils4j.imp.Pair;
 import com.github.utils4j.imp.Sizes;
@@ -66,7 +67,7 @@ import net.miginfocom.swing.MigLayout;
 public class FileListWindow extends SimpleDialog implements IFileListView {
 
   private static final int MIN_WIDTH = 600;
-  private static final int MIN_HEIGHT = 325;
+  private static final int MIN_HEIGHT = Jvms.isWindows() ? 340 : 360;
 
   private JTable table;
   private File outputFile;
@@ -292,13 +293,12 @@ public class FileListWindow extends SimpleDialog implements IFileListView {
       }));
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     invokeLater(() -> {
       List<File> files = createListFiles();
       IFileListView window = new FileListWindow(Images.FIRST.asImage(), files, Media.PDF, null);
       File fileName = window.getOutputFile().orElse(null);
       System.out.println(fileName);
-      System.exit(0);
     });
   }
 }

@@ -25,35 +25,10 @@
 */
 
 
-package com.github.utils4j.gui.imp;
+package com.github.utils4j.imp.function;
 
-import com.github.utils4j.gui.IPicture;
-
-public enum Images implements IPicture {
-  FIRST("/file-first.png"),
-  
-  UP("/file-up.png"),
-
-  DOWN("/file-down.png"),
-  
-  LAST("/file-last.png"),
-  
-  ADD("/file-add.png"),
-  
-  REM("/file-rem.png"),
-  
-  ECHO("/echo.png"),
-  
-  SHIELD("/shield.png");
-  
-  final String path;
-  
-  Images(String path) {
-    this.path = path;
-  }
-
-  @Override
-  public String path() {
-    return path;
-  }
+@FunctionalInterface
+public interface ITransformer<T> {
+  T transform(T t);
 }
+

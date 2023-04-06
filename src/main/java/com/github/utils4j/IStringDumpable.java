@@ -24,36 +24,16 @@
 * SOFTWARE.
 */
 
+package com.github.utils4j;
 
-package com.github.utils4j.gui.imp;
+import com.github.utils4j.imp.Strings;
 
-import com.github.utils4j.gui.IPicture;
+public interface IStringDumpable {
 
-public enum Images implements IPicture {
-  FIRST("/file-first.png"),
-  
-  UP("/file-up.png"),
-
-  DOWN("/file-down.png"),
-  
-  LAST("/file-last.png"),
-  
-  ADD("/file-add.png"),
-  
-  REM("/file-rem.png"),
-  
-  ECHO("/echo.png"),
-  
-  SHIELD("/shield.png");
-  
-  final String path;
-  
-  Images(String path) {
-    this.path = path;
+  static IStringDumpable from(Object a) { 
+    return () -> Strings.trim(a);
   }
+  
+  String dump();
 
-  @Override
-  public String path() {
-    return path;
-  }
 }

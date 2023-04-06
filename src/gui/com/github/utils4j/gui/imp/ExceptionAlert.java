@@ -139,9 +139,7 @@ public final class ExceptionAlert extends SimpleFrame {
 
   private JPanel south() {
     JButton okButton = new JButton("OK");
-    okButton.addActionListener((e) -> {
-      onEscPressed(e);      
-    });
+    okButton.addActionListener(this::onEscPressed);
     southPane.setLayout(new MigLayout("center"));
     southPane.add(okButton);
     southPane.setVisible(false);
@@ -150,11 +148,7 @@ public final class ExceptionAlert extends SimpleFrame {
 
   private void setDetail(JLabel seeDetailsPane) {
     boolean show = seeDetailsPane.getText().contains("Ver");
-    if (show) {
-      setExtendedState(JFrame.MAXIMIZED_BOTH);
-    }else {
-      setExtendedState(JFrame.NORMAL);
-    }
+    setExtendedState(show ? JFrame.MAXIMIZED_BOTH : JFrame.NORMAL);
     centerPane.setVisible(show);
     southPane.setVisible(show);
   }
@@ -214,14 +208,11 @@ public final class ExceptionAlert extends SimpleFrame {
       sb.append("IDENTIFICADA(S) A(S) SEGUINTE(S) CAUSA(S):\n");
       int i = 0, n = 1;
       do {
-        String message;
-        if (!(message = trim(messages[i])).isEmpty()) {
-          sb.append("\t")
-            .append(padStart(n++, 2))
-            .append(") ")
-            .append(message)
-            .append('\n');
-        }
+        sb.append("\t")
+          .append(padStart(n++, 2))
+          .append(") ")
+          .append(messages[i])
+          .append('\n');
       } while(++i < size);
       sb.append("\n********************************************************************\n");
     };

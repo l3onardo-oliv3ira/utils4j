@@ -94,4 +94,12 @@ public class Jvms {
     Args.requireText(paramName, "paramName is empty").trim();
     return format("-D%s=%s", trim(paramName), trim(paramValue));
   }
+  
+  public static boolean isNative64bits() {
+    if (is64Bits())
+      return true;
+    if (isWindows())
+      return new File("C:/Windows/SysWOW64").exists() || System.getenv("ProgramFiles(X86)") != null;
+    return false;
+  }
 }

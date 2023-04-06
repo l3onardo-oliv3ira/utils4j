@@ -47,7 +47,11 @@ public enum Browser {
   }
   
   public static void navigateTo(String endpoint) {
-    whoIsDefault().open(endpoint);;
+    navigateTo(endpoint, true);
+  }
+  
+  public static void navigateTo(String endpoint, boolean alertHttps) {
+    whoIsDefault().open(endpoint, alertHttps); 
   }
   
   public static void navigateTo(String endpoint, Image icon) {
@@ -71,7 +75,15 @@ public enum Browser {
     }
   };
   
+  public void open(String url, boolean alertHttps) {
+    open(url, null, alertHttps);
+  }
+  
   public void open(String url, Image icon) {
+    open(url, icon, true);
+  }
+  
+  public void open(String url, Image icon, boolean alertHttps) {
     url = Args.requireText(url, "url is null").trim();
     Browser self = this;
     try {
@@ -88,7 +100,7 @@ public enum Browser {
         icon
       );
     } finally {
-      if (url.toLowerCase().startsWith("https:")) {
+      if (alertHttps && url.toLowerCase().startsWith("https:")) {
         MessageAlert.showInfo("Caso se depare com uma página com "
           + "erro no certificado, confirme a exceção de segurança\n" 
           + "clicando em " + (self == UNKNOWN ? "\n  " : "") 

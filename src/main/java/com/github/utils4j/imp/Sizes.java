@@ -38,6 +38,7 @@ public enum Sizes {
   PB(TB.size * 1024, "PB");
   
   private final long size;
+  
   private final String label;
   
   private Sizes(long size, String label) {

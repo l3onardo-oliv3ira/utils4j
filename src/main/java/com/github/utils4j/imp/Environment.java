@@ -50,10 +50,14 @@ public final class Environment {
     return pathFrom(environmentVariableKey, false);
   }
 
+  public static Optional<Path> requirePathFrom(final String environmentVariableKey) { 
+    return pathFrom(environmentVariableKey, false, true);
+  }
+
   public static Optional<Path> pathFrom(final String environmentVariableKey, boolean defaultToUserHome) { 
     return pathFrom(environmentVariableKey, defaultToUserHome, false);
   }
-
+  
   public static Optional<Path> pathFrom(final String environmentVariableKey, boolean defaultToUserHome, boolean mustExists) { 
     return pathFrom(environmentVariableKey, defaultToUserHome ? Paths.get(getProperty("user.home")) : null, mustExists);
   }
@@ -76,6 +80,10 @@ public final class Environment {
   
   public static Optional<Path> resolveTo(final String environmentVariableKey, String fileName, boolean defaultToUserHome) {
     return resolveTo(environmentVariableKey, fileName, defaultToUserHome, false);
+  }
+  
+  public static Optional<Path> requireResolveTo(final String environmentVariableKey, String fileName) {
+    return resolveTo(environmentVariableKey, fileName, false, true);
   }
   
   public static Optional<Path> resolveTo(final String environmentVariableKey, String fileName, boolean defaultToUserHome, boolean mustExists) {

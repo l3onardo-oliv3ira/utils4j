@@ -52,6 +52,10 @@ import com.github.utils4j.IAcumulator;
 import com.github.utils4j.IConstants;
 
 public class Streams {
+  
+  public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+  
+  
   private Streams() {
   }
 
@@ -135,7 +139,7 @@ public class Streams {
       return DigestUtils.sha1Hex(fis);
     }
   }
-
+  
   public static String sha1(byte[] input) {
     return DigestUtils.sha1Hex(input);
   }
@@ -162,11 +166,15 @@ public class Streams {
 
   public static byte[] fromResource(String name) throws IOException {
     try(InputStream is = Streams.class.getResourceAsStream(name)) {
+      if (is == null)
+        throw new IOException("Resource does not exists: " + name);
       return fromStream(is);
     }
   }
-
+  
   public static byte[] fromStream(InputStream is) throws IOException {
+    if (is == null)
+      return EMPTY_BYTE_ARRAY;
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     byte[] data = new byte[1024];
     int read;
