@@ -57,6 +57,9 @@ import static com.github.utils4j.imp.Throwables.runQuietly;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Um BooleanTimeout é um objeto que após ganhar o valor TRUE, voltará automaticamente a ter um valor FALSE
  * após um período de timeout desde a última vez que foi consultado (isTrue)
@@ -65,9 +68,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class BooleanTimeout {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(BooleanTimeout.class);
+  
+  private final String name;
+
   private final long timeout;
 
-  private volatile Thread rollbackThread;
+  private Thread rollbackThread;
 
   private volatile long lastTime;
   
@@ -75,11 +82,12 @@ public class BooleanTimeout {
 
   private final AtomicBoolean value = new AtomicBoolean(false);
 
-  public BooleanTimeout(long timeout) {
-    this(timeout, () -> {});
+  public BooleanTimeout(String name, long timeout) {
+    this(name, timeout, () -> {});
   }
 
-  public BooleanTimeout(long timeout, Runnable timeoutCode) {
+  public BooleanTimeout(String name, long timeout, Runnable timeoutCode) {
+    this.name = Args.requireText(name, "name is empty");
     this.timeout = Args.requireZeroPositive(timeout, "timeout is negative");
     this.timeoutCode = Args.requireNonNull(timeoutCode, "timeoutCode is null");
   }  
@@ -88,21 +96,21 @@ public class BooleanTimeout {
     lastTime = System.currentTimeMillis();
   }
   
-  private long diffTime() {
-    return System.currentTimeMillis() - lastTime;
+  private long deadline() {
+    return lastTime + timeout;
   }
-  
-  private long waitingTime() {
-    return (lastTime + timeout) - System.currentTimeMillis() + 50; //50 is margin of error
+
+  private long deadlineRemaining() {
+    return deadline() - System.currentTimeMillis();
   }
   
   private boolean hasTimeout() {
-    return diffTime() >= timeout;
+    return deadline() <= System.currentTimeMillis();
   }
 
-  private void start() {
+  private synchronized void start() {
     if (rollbackThread == null) {
-      rollbackThread = startDaemon("rollback boolean to false timeout", this::roolbackToFalse);
+      rollbackThread = startDaemon(name + ": rollback boolean to false timeout", this::roolbackToFalse);
     }
   }
 
@@ -123,7 +131,7 @@ public class BooleanTimeout {
     return state;
   }
   
-  public void shutdown() {
+  public synchronized void shutdown() {
     if (rollbackThread != null) {
       rollbackThread.interrupt();
       rollbackThread = null;
@@ -145,17 +153,23 @@ public class BooleanTimeout {
       }
       
       while(!hasTimeout()) {
-        synchronized(value) {
-          try {
-            value.wait(waitingTime());
-          } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            break out;
+        long waitingTime = deadlineRemaining();
+        if (waitingTime > 0) {
+          synchronized(value) {
+            try {
+              value.wait(waitingTime + 20); //20 is margin of error
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+              break out;
+            }
           }
         }
       }
         
       value.set(false);
+      
+      LOGGER.debug(":> reset to false");
+      
       runQuietly(timeoutCode::run);      
 
     } while(!Thread.currentThread().isInterrupted());

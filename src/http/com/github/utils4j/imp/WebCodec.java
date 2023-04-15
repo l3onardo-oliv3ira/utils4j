@@ -34,13 +34,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.stream.Collectors;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ParseException;
@@ -54,75 +54,151 @@ import com.github.utils4j.imp.function.IProvider;
 
 public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
 
-  protected boolean isSuccess(int code) {
-    return (code >= HttpStatus.SC_SUCCESS && code < HttpStatus.SC_REDIRECTION) || code == HttpStatus.SC_NOT_MODIFIED; 
-  }
-  
   protected final CloseableHttpClient client;
   
   protected WebCodec(CloseableHttpClient client) {
     this.client = Args.requireNonNull(client, "client is null");
   }
   
+  protected boolean isSuccess(int code) {
+    return (code >= HttpStatus.SC_SUCCESS && code < HttpStatus.SC_REDIRECTION) || code == HttpStatus.SC_NOT_MODIFIED; 
+  }
+  
+  protected void handleSuccess(IResultChecker checkResults, String responseText, int httpCode) throws Exception {
+    checkResults.handle(responseText, httpCode);
+  }
+ 
+  protected void handleFail(IResultChecker checkResults, String responseText, int httpCode) throws Exception {}  
+  
+  protected final Exception launch(String message) {
+    return launch(message, null);
+  }  
+
   @Override
   public R post(final IProvider<HttpPost> provider, IResultChecker checkResults) throws Exception {
-    try {      
-      final HttpPost post = provider.get();
-      
-      try(CloseableHttpResponse response = client.execute(post)) {
-      
-        final int code = response.getCode();
+    try {  
+      Optional<Exception> fail = client.execute(provider.get(), response -> {
 
-        String responseText = Strings.empty();
-
-        HttpEntity entity = response.getEntity();
-        
-        if (entity != null) {
-          try {
-            responseText = EntityUtils.toString(entity, IConstants.DEFAULT_CHARSET); //can return null
-          } catch (ParseException | IOException e) {
-            throw launch("Falha na leitura de entity - HTTP Code: " + code, e);
-          } finally {
-            EntityUtils.consumeQuietly(entity);  
+        try {
+          final int code = response.getCode();
+  
+          String responseText = Strings.empty();
+  
+          HttpEntity entity = response.getEntity();
+          
+          if (entity != null) {
+            try {
+              responseText = EntityUtils.toString(entity, IConstants.DEFAULT_CHARSET); //can return null
+            } catch (ParseException | IOException e) {
+              throw launch("Falha na leitura de entity - HTTP Code: " + code, e);
+            } finally {
+              EntityUtils.consumeQuietly(entity);  
+            }
+  
+            if (responseText == null) {
+              responseText = Strings.empty();
+            }
+          }
+          
+          if (isSuccess(code)) {
+            handleSuccess(checkResults, responseText, code);
+          } else {
+            handleFail(checkResults, responseText, code);
+            throw launch("Servidor retornando - HTTP Code: " + code + " Content: \n" + responseText);
           }
 
-          if (responseText == null) {
-            responseText = Strings.empty();
-          }
+          return Optional.empty();
+
+        } catch(Exception e) {
+          return Optional.of(e);
         }
-        
-        if (isSuccess(code)) {
-          handleSuccess(checkResults, responseText, code);
-        } else {
-          handleFail(checkResults, responseText, code);
-          throw launch("Servidor retornando - HTTP Code: " + code + " Content: \n" + responseText);
-        }
-        
-        return success();
+      });
+      
+      if (fail.isPresent()) {
+        throw fail.get();
       }
-
+      
+      return success();
+      
     } catch(CancellationException e) {
       throw launch("Os dados não foram enviados ao servidor. Operação cancelada!\n\tcause: " + rootMessage(e));
     }
   }
 
-  protected void handleSuccess(IResultChecker checkResults, String responseText, int httpCode) throws Exception {
-    checkResults.handle(responseText, httpCode);
-  }
- 
-  protected void handleFail(IResultChecker checkResults, String responseText, int httpCode) throws Exception {}
-  
   @Override
   public void get(IProvider<HttpGet> provider, IDownloadStatus status) throws Exception {
     
     try(OutputStream output = status.onNewTry()) {
       
-      final HttpGet get = provider.get();
-      
-      try(CloseableHttpResponse response = client.execute(get)) {
-        int code = response.getCode();
+      Optional<Exception> fail = client.execute(provider.get(), response -> {
+        
+        try {
+          int code = response.getCode();
 
+          HttpEntity entity = response.getEntity();
+          if (entity == null) {
+            throw launch("Servidor não foi capaz de retornar dados. (entity is null) - HTTP Code: " + code);
+          }
+        
+          try {
+            if (!isSuccess(code)) { 
+              throw launch("Servidor retornando - HTTP Code: " + code);
+            }
+            
+            try {
+              final long total = entity.getContentLength();
+              
+              final InputStream input = entity.getContent();
+              
+              status.onStartDownload(total);
+              
+              final byte[] buffer = new byte[128 * 1024];
+              
+              status.onStatus(total, 0);
+              
+              for(int length, written = 0; (length = input.read(buffer)) > 0; status.onStatus(total, written += length)) {
+                output.write(buffer, 0, length);
+              }
+              
+              status.onEndDownload();
+                
+            } catch(InterruptedException e) {     
+              throw new InterruptedException("Download interrompido - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));
+            
+            } catch(Exception e) {
+              throw launch("Falha durante o download do arquivo - HTTP Code: " + code, e);
+            }
+            
+          } finally {
+            EntityUtils.consumeQuietly(entity);
+          }
+          
+          return Optional.empty();
+        
+        } catch(Exception e){
+          return Optional.of(e);
+        }
+      });
+      
+      if (fail.isPresent()) {
+        throw fail.get();
+      }
+      
+    } catch (Exception e) {
+      status.onDownloadFail(e);
+      throw e;
+    }
+  }
+  
+  @Override
+  public String get(IProvider<HttpGet> provider) throws Exception {
+    
+    Optional<Object> out = client.execute(provider.get(), response -> {
+      try {
+        int code = response.getCode();
+  
         HttpEntity entity = response.getEntity();
+        
         if (entity == null) {
           throw launch("Servidor não foi capaz de retornar dados. (entity is null) - HTTP Code: " + code);
         }
@@ -132,76 +208,37 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
             throw launch("Servidor retornando - HTTP Code: " + code);
           }
           
-          try {
-            final long total = entity.getContentLength();
-            final InputStream input = entity.getContent();
-            
-            status.onStartDownload(total);
-            final byte[] buffer = new byte[128 * 1024];
-            
-            status.onStatus(total, 0);
-            for(int length, written = 0; (length = input.read(buffer)) > 0; status.onStatus(total, written += length))
-              output.write(buffer, 0, length);
-            status.onEndDownload();
-              
-          } catch(InterruptedException e) {     
-            throw new InterruptedException("Download interrompido - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));
-          } catch(Exception e) {
-            throw launch("Falha durante o download do arquivo - HTTP Code: " + code, e);
+          InputStream input = entity.getContent();
+          
+          if (input == null) {
+            return Optional.of(Strings.empty());
           }
+  
+          try(BufferedReader br = new BufferedReader(new InputStreamReader(input, IConstants.UTF_8))) {
+            return Optional.of(br.lines().collect(Collectors.joining("\n")));
+          }
+          
+        } catch(InterruptedException e) {     
+          throw new InterruptedException("Requisição GET interrompida - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));  
+        
+        } catch(Exception e) {
+          throw launch("Falha durante o requisição GET - HTTP Code: " + code, e);
+        
         } finally {
           EntityUtils.consumeQuietly(entity);
         }
-      } finally {
-        get.clear();
-      }
-    } catch (Exception e) {
-      status.onDownloadFail(e);
-      throw e;
-    }
-  }
-  
-  @Override
-  public String get(IProvider<HttpGet> provider) throws Exception {
-    final HttpGet get = provider.get();
-    
-    try(CloseableHttpResponse response = client.execute(get)) {
-      int code = response.getCode();
-
-      HttpEntity entity = response.getEntity();
-      if (entity == null) {
-        throw launch("Servidor não foi capaz de retornar dados. (entity is null) - HTTP Code: " + code);
-      }
-    
-      try {
-        if (!isSuccess(code)) { 
-          throw launch("Servidor retornando - HTTP Code: " + code);
-        }
-        
-        InputStream input = entity.getContent();
-        
-        if (input == null) {
-          return Strings.empty();
-        }
-
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(input, IConstants.UTF_8))) {
-          return br.lines().collect(Collectors.joining("\n"));
-        }
-        
-      } catch(InterruptedException e) {     
-        throw new InterruptedException("Requisição GET interrompida - HTTP Code: " + code + "\n\tcause: " + rootMessage(e));
       } catch(Exception e) {
-        throw launch("Falha durante o requisição GET - HTTP Code: " + code, e);
-      } finally {
-        EntityUtils.consumeQuietly(entity);
+        return Optional.of(e);
       }
-    } finally {
-      get.clear();
+    });
+    
+    Object response = out.orElseGet(Strings::empty);
+    
+    if (response instanceof Exception) {
+      throw (Exception)response;
     }
-  }
-  
-  protected final Exception launch(String message) {
-    return launch(message, null);
+
+    return response.toString();
   }
   
   protected abstract Exception launch(String message, Exception e);
