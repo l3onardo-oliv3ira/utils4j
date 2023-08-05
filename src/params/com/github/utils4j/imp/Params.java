@@ -79,4 +79,8 @@ public class Params implements IParams {
   public final IParam get(String key) {
     return Optional.ofNullable(params.get(key)).orElse(ParamImp.NULL);
   }
+
+  public final void clear() {
+    params.clear();
+  }
 }

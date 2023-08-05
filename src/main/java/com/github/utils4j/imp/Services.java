@@ -40,27 +40,31 @@ public final class Services {
   }
 
   public static void shutdownNow(ExecutorService pool) {
-    shutdownNow(pool, 5);
+    shutdownNow(pool, 5, Integer.MAX_VALUE);
+  }
+  
+  public static void shutdownNow(ExecutorService pool, long timeoutSec) {
+    shutdownNow(pool, timeoutSec, Integer.MAX_VALUE);
   }
 
-  public static void shutdownNow(ExecutorService pool, long timeoutSec) {
+  public static void shutdownNow(ExecutorService pool, long timeoutSec, int attemptCount) {
     if (pool != null) {
       LOGGER.debug("Impedindo que novas tarefas sejam submetidas");
       pool.shutdown();
       LOGGER.debug("Cancelando tarefas atualmente em execução");
       pool.shutdownNow();
-      waitFor(pool, timeoutSec);
+      waitFor(pool, timeoutSec, attemptCount);
     }
   }
 
   public static void shutdown(ExecutorService pool) {
     if (pool != null) {
       pool.shutdown();
-      waitFor(pool, 60);
+      waitFor(pool, 60, Integer.MAX_VALUE);
     }
   }
 
-  private static void waitFor(ExecutorService pool, long timeout) {
+  private static void waitFor(ExecutorService pool, long timeout, int attemptCount) {
     boolean shutdown = false;
     do{
       try {
@@ -74,6 +78,6 @@ public final class Services {
         LOGGER.debug("Novo pedido de cancelamento de tarefas em execução");
         pool.shutdownNow();
       }
-    }while (!shutdown);
+    }while (!shutdown && --attemptCount > 0);
   }
 }

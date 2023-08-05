@@ -59,7 +59,7 @@ public final class MessageAlert {
   public static void showInfo(String message, String textButton, Image icon) {
     invokeLater(() -> display(message, textButton, icon));
   }
-
+  
   public static boolean display(String message, Image icon) {
     return new MessageAlert(message, OPTIONS, JOptionPane.INFORMATION_MESSAGE).show(icon);
   }

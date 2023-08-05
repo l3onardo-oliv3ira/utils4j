@@ -27,24 +27,16 @@
 
 package com.github.utils4j.imp;
 
-public final class Booleans {
+public class DaemonThreadFactory extends CustomThreadFactory {
 
-  private Booleans() {
+  public DaemonThreadFactory(String baseName) {
+    super(baseName);
   }
 
-  public static boolean isTrue(Boolean value) {
-    return value != null && value.booleanValue();
-  }
-  
-  public static boolean isTrue(Boolean value, boolean nullIsTrue) {
-    return nullIsTrue ? (value == null || value.booleanValue()) : (value != null && value.booleanValue());
-  }
-  
-  public static boolean isFalse(Boolean value) {
-    return value != null && !value.booleanValue();  
-  }
-  
-  public static boolean isTrue(Object value) {
-    return value != null && Boolean.valueOf(value.toString());
+  @Override
+  protected void customize(Thread thread) {
+    thread.setDaemon(true);
+    if (thread.getPriority() != Thread.NORM_PRIORITY)
+      thread.setPriority(Thread.NORM_PRIORITY);
   }
 }

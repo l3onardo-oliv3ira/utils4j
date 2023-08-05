@@ -183,7 +183,6 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
       if (fail.isPresent()) {
         throw fail.get();
       }
-      
     } catch (Exception e) {
       status.onDownloadFail(e);
       throw e;
@@ -192,7 +191,7 @@ public abstract class WebCodec<R> implements ISocketCodec<HttpPost, R> {
   
   @Override
   public String get(IProvider<HttpGet> provider) throws Exception {
-    
+
     Optional<Object> out = client.execute(provider.get(), response -> {
       try {
         int code = response.getCode();

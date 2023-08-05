@@ -55,6 +55,8 @@ package com.github.utils4j.imp;
 import static com.github.utils4j.imp.Threads.startDaemon;
 import static com.github.utils4j.imp.Throwables.runQuietly;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -70,6 +72,8 @@ public class BooleanTimeout {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BooleanTimeout.class);
   
+  private static final int DEFAULT_TIMEOUT = 2000;
+  
   private final String name;
 
   private final long timeout;
@@ -81,7 +85,17 @@ public class BooleanTimeout {
   private final Runnable timeoutCode;
 
   private final AtomicBoolean value = new AtomicBoolean(false);
+  
+  private final List<Runnable> ephemeralTimeoutCodes = new ArrayList<>(4);
 
+  public BooleanTimeout(String name) {
+    this(name, DEFAULT_TIMEOUT);
+  }
+  
+  public BooleanTimeout(String name, Runnable timeoutCode) {
+    this(name, DEFAULT_TIMEOUT, timeoutCode);
+  }
+  
   public BooleanTimeout(String name, long timeout) {
     this(name, timeout, () -> {});
   }
@@ -91,6 +105,10 @@ public class BooleanTimeout {
     this.timeout = Args.requireZeroPositive(timeout, "timeout is negative");
     this.timeoutCode = Args.requireNonNull(timeoutCode, "timeoutCode is null");
   }  
+
+  public final long getTimeout() {
+    return timeout;
+  }
   
   private void reset() {
     lastTime = System.currentTimeMillis();
@@ -119,6 +137,19 @@ public class BooleanTimeout {
     isTrue();
     synchronized(value) {
       value.notifyAll();
+    }
+  }
+  
+  public final void setTrue(Runnable timeoutCode) {
+    synchronized(ephemeralTimeoutCodes) {
+      setTrue();
+      addEphemeralTimeout(timeoutCode);
+    }
+  }
+
+  private void addEphemeralTimeout(Runnable timeoutCode) {
+    if (timeoutCode != null) {      
+      ephemeralTimeoutCodes.add(timeoutCode);
     }
   }
   
@@ -168,10 +199,25 @@ public class BooleanTimeout {
         
       value.set(false);
       
-      LOGGER.debug(":> reset to false");
-      
-      runQuietly(timeoutCode::run);      
+      LOGGER.debug(name + ": reset to false");
 
+      runTimeout();
+      
     } while(!Thread.currentThread().isInterrupted());
+  }
+
+  private void runTimeout() {
+    runQuietly(timeoutCode::run);
+    
+    List<Runnable> codes;
+    synchronized(ephemeralTimeoutCodes) {
+      codes = new ArrayList<>(ephemeralTimeoutCodes.size());
+      codes.addAll(ephemeralTimeoutCodes);
+      ephemeralTimeoutCodes.clear();        
+    }
+
+    for(Runnable r: codes) {
+      runQuietly(r::run);
+    }
   }
 }

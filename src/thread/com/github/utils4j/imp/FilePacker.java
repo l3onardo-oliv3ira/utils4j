@@ -49,20 +49,20 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
   
   private static final long TIMEOUT_TIMER = 2000;
 
-  private final Path folderWatching;
-  
-  private WatchService watchService;
-
-  private List<File> pathPool = new LinkedList<File>();
-
-  private final List<List<File>> availableFiles =  new LinkedList<>();
-  
   private long startTime;
   
   private final File lockFile;
   
-  private RandomAccessFile lock = null;
+  private final Path folderWatching;
   
+  private WatchService watchService;
+
+  private RandomAccessFile lock = null;
+
+  private List<File> pathPool = new LinkedList<File>();
+
+  private final List<List<File>> availableFiles =  new LinkedList<>();
+
   public FilePacker(Path folderWatching) {
     super("shell-packer");
     this.folderWatching = Args.requireNonNull(folderWatching, "folderWatching is null");
@@ -160,7 +160,7 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
     do {
       while((key = watchService.poll(250, TimeUnit.MILLISECONDS)) == null) {
         if (!pathPool.isEmpty() && hasTimeout()) {
-          makeBlocksAvailable(block());
+          offer(block());
         }
       }
       try {
@@ -179,7 +179,7 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
           continue;
         }
         
-        makeBlocksAvailable(block());
+        offer(block());
 
       }finally {
         key.reset();
@@ -188,11 +188,13 @@ public class FilePacker<E extends Exception> extends ThreadContext<E> implements
     } while(true);
   }
 
-  private void makeBlocksAvailable(List<File> block) throws InterruptedException {
-    synchronized(availableFiles) {
-      availableFiles.add(block);
-      availableFiles.notifyAll();
-      onAvailable(block);
+  public final void offer(List<File> block) throws InterruptedException {
+    if (block != null) {
+      synchronized(availableFiles) {
+        availableFiles.add(block);
+        availableFiles.notifyAll();
+        onAvailable(block);
+      }
     }
   }
 

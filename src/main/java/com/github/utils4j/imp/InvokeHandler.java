@@ -29,22 +29,31 @@ package com.github.utils4j.imp;
 
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.utils4j.imp.function.IProvider;
 
 public abstract class InvokeHandler<E extends Throwable> {
   
+  private static final Logger LOGGER = LoggerFactory.getLogger(InvokeHandler.class);
+  
+  private static final Runnable DEFAULT_FINALLY_BLOCK = () -> {};
+
+  private static final Consumer<Throwable> DEFAULT_CATCH_BLOCK = (e) -> LOGGER.warn("InvokeHandler (catchBlock)", e); 
+  
   protected InvokeHandler() {}
   
   public final <T> T invoke(IProvider<T> tryBlock) throws E { 
-    return invoke(tryBlock, (e) -> {});
+    return invoke(tryBlock, DEFAULT_CATCH_BLOCK);
   }
 
   public final <T> T invoke(IProvider<T> tryBlock, Runnable finallyBlock) throws E {
-    return invoke(tryBlock, (e) -> {}, finallyBlock);
+    return invoke(tryBlock, DEFAULT_CATCH_BLOCK, finallyBlock);
   }
     
   public final <T> T invoke(IProvider<T> tryBlock, Consumer<Throwable> catchBlock) throws E {
-    return invoke(tryBlock, catchBlock, () -> {});
+    return invoke(tryBlock, catchBlock, DEFAULT_FINALLY_BLOCK);
   }
 
   public abstract <T> T invoke(IProvider<T> tryBlock, Consumer<Throwable> catchBlock, Runnable finallyBlock) throws E;

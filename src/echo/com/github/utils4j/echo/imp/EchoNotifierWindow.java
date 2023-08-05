@@ -36,6 +36,7 @@ import com.github.utils4j.gui.imp.SimpleFrame;
 import com.github.utils4j.gui.imp.SwingTools;
 import com.github.utils4j.imp.Args;
 import com.github.utils4j.imp.Strings;
+import com.github.utils4j.imp.Threads;
 
 public class EchoNotifierWindow extends EchoNotifier {
   
@@ -85,7 +86,9 @@ public class EchoNotifierWindow extends EchoNotifier {
   @Override
   protected void doClose() {
     super.doClose();
-    runQuietly(frame::close);
+    if (!Threads.isShutdownHook()) {
+      runQuietly(frame::close);
+    }
   }
 
   @Override

@@ -60,19 +60,21 @@ public class Streams {
   }
 
   public static void closeQuietly(Closeable c) {
-    try {
-      c.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    if (c != null)
+      try {
+        c.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
   }
 
   public static void closeQuietly(AutoCloseable c) {
-    try {
-      c.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    if (c != null)
+      try {
+        c.close();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
   }
 
   public static void closeQuietly(OutputStream s) {

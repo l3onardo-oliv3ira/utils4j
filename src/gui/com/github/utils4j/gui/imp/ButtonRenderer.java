@@ -56,6 +56,11 @@ public class ButtonRenderer extends AbstractCellEditor implements TableCellRende
     this.editButton.addActionListener( this );
   }
 
+  public void setViewEnabled(boolean enabled) {
+    this.renderButton.setEnabled(enabled);
+    this.editButton.setEnabled(enabled);
+  }
+  
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
     if (hasFocus) {
       renderButton.setForeground(table.getForeground());

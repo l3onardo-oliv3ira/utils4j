@@ -24,20 +24,11 @@
 * SOFTWARE.
 */
 
-package com.github.utils4j.imp;
 
-import java.util.function.Supplier;
+package com.github.utils4j.imp.function;
 
-public final class SupplierThreadLocal<T> extends ThreadLocal<T> {
-
-  private final Supplier<? extends T> supplier;
-
-  public SupplierThreadLocal(Supplier<? extends T> supplier) {
-    this.supplier = Args.requireNonNull(supplier, "supplier is null");
-  }
-
-  @Override
-  protected T initialValue() {
-    return supplier.get();
-  }
+@FunctionalInterface
+public interface IBiCreator<T, K, R, E extends Exception> {
+  R create(T t, K k) throws E;
 }
+

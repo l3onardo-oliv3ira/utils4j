@@ -25,14 +25,20 @@
 */
 
 
+
 package com.github.utils4j.imp;
 
 import static com.github.utils4j.imp.Directory.stringPath;
+import static com.github.utils4j.imp.Streams.readOutStream;
 import static com.github.utils4j.imp.Strings.trim;
+import static com.github.utils4j.imp.Throwables.runQuietly;
 import static java.lang.String.format;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Path;
+
+import com.github.utils4j.IConstants;
 
 //$MAJOR.$MINOR.$SECURITY.$PATCH for java 9+
 //1.$MAJOR.$MINOR_$UPDATE-$BUILD
@@ -101,5 +107,23 @@ public class Jvms {
     if (isWindows())
       return new File("C:/Windows/SysWOW64").exists() || System.getenv("ProgramFiles(X86)") != null;
     return false;
+  }
+ 
+  public static boolean isMacArm() {
+    if (!isMac())
+      return false;
+    try {
+      Process process = new ProcessBuilder("sysctl", "-n", "machdep.cpu.brand_string").start();
+      String output;
+      try(InputStream input = process.getInputStream()) {
+        output = Strings.trim(readOutStream(input, IConstants.CP_850).get()).toLowerCase();
+        process.waitFor();
+      } finally {
+        runQuietly(process.destroyForcibly()::waitFor);
+      }
+      return output.indexOf("intel") < 0;
+    }catch(Exception e) {
+      return false;
+    }
   }
 }

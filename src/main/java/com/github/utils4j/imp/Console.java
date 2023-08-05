@@ -25,10 +25,39 @@
 */
 
 
-package com.github.utils4j;
+package com.github.utils4j.imp;
 
-import java.util.Iterator;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Optional;
 
-public interface IResetableIterator<T> extends Iterator<T>{
-  public void reset();
+public enum Console {
+  
+  READER;
+  
+  final BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+  
+  public Optional<String> readLine() {
+    try {
+      return Strings.optional(console.readLine());
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+  
+  public Optional<Integer> readInt() {
+    try {
+      return Optional.of(Integer.parseInt(console.readLine())); 
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+  
+  public Optional<Float> readFloat() {
+    try {
+      return Optional.of(Float.parseFloat(console.readLine())); 
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
 }

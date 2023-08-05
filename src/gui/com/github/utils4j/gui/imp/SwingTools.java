@@ -118,6 +118,10 @@ public class SwingTools {
   private static Stack<Window> stackOnTop = new Stack<>();
 
   public static void showToFront(Window window) {
+    showToFront(window, true);
+  }
+  
+  public static void showToFront(Window window, boolean force) {
     Args.requireNonNull(window, "window is null");
 
     if (window instanceof Dialog) {
@@ -127,7 +131,7 @@ public class SwingTools {
           stackOnTop.peek().setAlwaysOnTop(false);        
         window.setAlwaysOnTop(true);
         stackOnTop.push(window);
-        toFront(window, null);
+        toFront(window, null, force);
         d.setVisible(true);
         stackOnTop.pop();
         if (!stackOnTop.isEmpty())
@@ -136,16 +140,17 @@ public class SwingTools {
       }
     }
     boolean top = window.isAlwaysOnTop();
-    window.setAlwaysOnTop(true);
+    if (force)
+      window.setAlwaysOnTop(true);
     window.setVisible(true);    
-    toFront(window, top);
+    toFront(window, top, force);
   }
 
-  private static void toFront(Window window, Boolean top) {
+  private static void toFront(Window window, Boolean top, boolean force) {
     startDaemon(() -> invokeLater(() -> {
-      if (Jvms.isWindows())
+      if (Jvms.isWindows() && force)
         window.toFront();
-      if (top != null) {
+      if (top != null && force) {
         window.setAlwaysOnTop(top);
       }
     }), 600); //force to on top after some milliseconds   
